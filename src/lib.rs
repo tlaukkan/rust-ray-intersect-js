@@ -1,5 +1,4 @@
-mod utils;
-
+use std::panic;
 use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -9,11 +8,47 @@ use wasm_bindgen::prelude::*;
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
-extern {
+extern "C" {
     fn alert(s: &str);
+}
+
+/// Initialized panic hook.
+#[wasm_bindgen]
+pub fn init_panic_hook() {
+    #[cfg(feature = "console_error_panic_hook")]
+    console_error_panic_hook::set_once();
 }
 
 #[wasm_bindgen]
 pub fn greet() {
     alert("Hello, rust-ray-intersect-js!");
+}
+
+#[wasm_bindgen]
+pub fn add(a: f64, b: f64) -> f64 {
+    a + b
+}
+
+#[wasm_bindgen]
+pub fn bad_add(a: f64, b: f64) -> f64 {
+    a - b
+}
+
+#[cfg(test)]
+mod tests {
+
+    // Note this useful idiom: importing names from outer (for mod tests) scope.
+    use super::*;
+
+    #[test]
+    fn test_add() {
+        assert_eq!(add(1.0, 2.0), 3.0);
+    }
+
+    #[test]
+    fn test_bad_add() {
+        // This assert would fire and test will fail.
+        // Please note, that private functions can be tested too!
+        assert_eq!(bad_add(1.0, 2.0), 3.0);
+    }
 }

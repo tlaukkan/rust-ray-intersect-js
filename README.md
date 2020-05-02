@@ -1,6 +1,6 @@
 # rust-ray-intersect-js
 
-Ray intersect implementation with Rust for JavaScript.
+Sandbox project for ray intersect implementation with Rust for JavaScript.
 
 ### Build with `wasm-pack build`
 
@@ -22,7 +22,7 @@ wasm-pack publish
 
 ## Initial project setup notes
 
-Template generated on macOS Catalina 10.15.4
+Template generated on macOS Catalina.
 
 ```
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh

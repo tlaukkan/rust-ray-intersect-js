@@ -1,6 +1,6 @@
 [package]
-name = "rust-ray-intersect-js"
-version = "0.1.0"
+name = "intersect"
+version = "0.0.1"
 authors = ["Tommi Laukkanen <tommi.laukkanen@codereality.io>"]
 edition = "2018"
 
