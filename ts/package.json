@@ -2,8 +2,11 @@
   "name": "ts-ray-intersect",
   "version": "1.0.0",
   "dependencies": {
+    "babylonjs": "4.2.0-alpha.13",
+    "babylonjs-loaders": "4.2.0-alpha.13",
     "rust-ray-intersect": "file:../pkg",
-    "tslib": "^1.10.0"
+    "tslib": "^1.10.0",
+    "xhr2": "^0.2.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
