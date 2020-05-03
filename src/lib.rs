@@ -1,12 +1,6 @@
-extern crate serde_json;
-extern crate wasm_bindgen;
 use js_sys;
 use wasm_bindgen::prelude::*;
 
-#[macro_use]
-extern crate serde_derive;
-
-use std::panic;
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
 #[cfg(feature = "wee_alloc")]
