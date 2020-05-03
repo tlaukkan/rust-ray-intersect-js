@@ -162,7 +162,6 @@ export const __wbindgen_object_drop_ref = function(arg0) {
     takeObject(arg0);
 };
 
-
 const bytes = _base64ToArrayBuffer(wasmBase64Bytes);
 
 // Disabled synchonous compile as chrome does not support this.
