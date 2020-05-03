@@ -1,4 +1,14 @@
+#[macro_use]
+extern crate lazy_static;
+
+use bvh::aabb::{Bounded, AABB};
+use bvh::bounding_hierarchy::{BHShape, BoundingHierarchy};
+use bvh::bvh::BVH;
+use bvh::ray::Ray;
 use js_sys;
+use nalgebra::{Point3, Vector3};
+use std::collections::HashMap;
+use std::sync::Mutex;
 use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -12,16 +22,12 @@ extern "C" {
     fn alert(s: &str);
 }
 
-/// Initialized panic hook.
 #[wasm_bindgen]
-pub fn init_panic_hook() {
-    #[cfg(feature = "console_error_panic_hook")]
-    console_error_panic_hook::set_once();
-}
-
-#[wasm_bindgen]
-pub fn greet() {
-    alert("Hello, rust-ray-intersect-js!");
+pub struct Intersection {
+    pub triangle_index: u32,
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
 }
 
 #[wasm_bindgen]
@@ -30,14 +36,6 @@ pub fn save_mesh_triangles(
     indices: js_sys::Uint32Array,
     positions: js_sys::Float32Array,
 ) {
-}
-
-#[wasm_bindgen]
-pub struct Intersection {
-    pub triangle_index: u32,
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
 }
 
 #[wasm_bindgen]
@@ -51,6 +49,69 @@ pub fn intersect_vector_with_mesh_triangles(
     end_z: f32,
 ) -> Option<Intersection> {
     return None;
+}
+
+#[wasm_bindgen]
+pub fn init_panic_hook() {
+    #[cfg(feature = "console_error_panic_hook")]
+    console_error_panic_hook::set_once();
+}
+
+pub struct Triangle {
+    pub a: Point3<f32>,
+    pub b: Point3<f32>,
+    pub c: Point3<f32>,
+    aabb: AABB,
+    node_index: usize,
+}
+
+impl Triangle {
+    pub fn new(a: Point3<f32>, b: Point3<f32>, c: Point3<f32>) -> Triangle {
+        Triangle {
+            a: a,
+            b: b,
+            c: c,
+            aabb: AABB::empty().grow(&a).grow(&b).grow(&c),
+            node_index: 0,
+        }
+    }
+}
+
+impl Bounded for Triangle {
+    fn aabb(&self) -> AABB {
+        self.aabb
+    }
+}
+
+impl BHShape for Triangle {
+    fn set_bh_node_index(&mut self, index: usize) {
+        self.node_index = index;
+    }
+
+    fn bh_node_index(&self) -> usize {
+        self.node_index
+    }
+}
+
+lazy_static! {
+    static ref HASHMAP: Mutex<HashMap<String, BVH>> = {
+        let mut m = HashMap::new();
+        Mutex::new(m)
+    };
+}
+
+fn add_bvh_from_triangles(key: String, triangles: &mut Vec<Triangle>) {
+    let mut map = HASHMAP.lock().unwrap();
+    map.insert(key, BVH::build(triangles));
+}
+
+// -------------------------------------------------------------------------------------------------
+// Interface test code starts from here ------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+#[wasm_bindgen]
+pub fn greet() {
+    alert("Hello, rust-ray-intersect-js!");
 }
 
 #[wasm_bindgen]
@@ -80,6 +141,10 @@ pub fn test_float_64_array(array: js_sys::Float64Array) -> usize {
     let elements: Vec<f64> = array.to_vec();
     return elements.len();
 }
+
+// -------------------------------------------------------------------------------------------------
+// Unit tests --------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 #[cfg(test)]
 mod tests {
