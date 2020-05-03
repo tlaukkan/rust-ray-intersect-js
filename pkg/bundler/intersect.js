@@ -165,10 +165,16 @@ export const __wbindgen_object_drop_ref = function(arg0) {
 
 const bytes = _base64ToArrayBuffer(wasmBase64Bytes);
 
-const wasmModule = new WebAssembly.Module(bytes);
-const wasmInstance = new WebAssembly.Instance(wasmModule, imports);
-wasm = wasmInstance.exports;
-//export __wasm = wasm;
+// Disabled synchonous compile as chrome does not support this.
+//const wasmModule = new WebAssembly.Module(bytes);
+//const wasmInstance = new WebAssembly.Instance(wasmModule, imports);
+//wasm = wasmInstance.exports;
+
+export async function init() {
+    const wasmInstanceSource = await WebAssembly.instantiate(bytes , imports);
+    const wasmInstance = wasmInstanceSource.instance;
+    wasm = wasmInstance.exports;
+}
 
 function _base64ToArrayBuffer(base64) {
     var binary_string = window.atob(base64);
