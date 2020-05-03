@@ -5,7 +5,8 @@ Sandbox project for ray intersect implementation with Rust for JavaScript.
 ### Build with `wasm-pack build`
 
 ```
-wasm-pack build --scope tlaukkan
+
+wasm-pack build --scope tlaukkan --target nodejs
 ```
 
 ### Test in Headless Browsers with `wasm-pack test`
@@ -20,11 +21,14 @@ wasm-pack test --headless --firefox
 npm publish --access=public
 ```
 
-### Publish to NPM with `wasm-pack publish`
+### Build and Publish to NPM
 
 ```
-wasm-pack publish
+wasm-pack build --release --scope tlaukkan --target bundler --out-dir pkg/bundler
+wasm-pack build --release --scope tlaukkan --target node --out-dir pkg/node
+wasm-pack build --release --scope tlaukkan --target web --out-dir pkg/web
 ```
+
 
 ### Deprecate from NPM
 

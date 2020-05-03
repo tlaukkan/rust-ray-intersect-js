@@ -1,6 +1,6 @@
 [package]
 name = "intersect"
-version = "0.0.1"
+version = "0.0.6"
 authors = ["Tommi Laukkanen <tommi.laukkanen@codereality.io>"]
 edition = "2018"
 
