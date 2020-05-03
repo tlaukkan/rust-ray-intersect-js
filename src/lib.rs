@@ -1,6 +1,12 @@
-use std::panic;
+extern crate serde_json;
+extern crate wasm_bindgen;
+use js_sys;
 use wasm_bindgen::prelude::*;
 
+#[macro_use]
+extern crate serde_derive;
+
+use std::panic;
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
 #[cfg(feature = "wee_alloc")]
@@ -32,6 +38,24 @@ pub fn add(a: f64, b: f64) -> f64 {
 #[wasm_bindgen]
 pub fn bad_add(a: f64, b: f64) -> f64 {
     a - b
+}
+
+#[wasm_bindgen]
+pub fn test_number_array(array: JsValue) -> usize {
+    let elements: Vec<u32> = array.into_serde().unwrap();
+    return elements.len();
+}
+
+#[wasm_bindgen]
+pub fn test_float_32_array(array: js_sys::Float32Array) -> usize {
+    let elements: Vec<f32> = array.to_vec();
+    return elements.len();
+}
+
+#[wasm_bindgen]
+pub fn test_float_64_array(array: js_sys::Float64Array) -> usize {
+    let elements: Vec<f64> = array.to_vec();
+    return elements.len();
 }
 
 #[cfg(test)]

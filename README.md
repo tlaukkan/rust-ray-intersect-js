@@ -24,8 +24,8 @@ npm publish --access=public
 ### Build and Publish to NPM
 
 ```
+wasm-pack build --release --scope tlaukkan --target nodejs --out-dir pkg/node && cp pkg/node/intersect.d.ts pkg/intersect.d.ts
 wasm-pack build --release --scope tlaukkan --target bundler --out-dir pkg/bundler
-wasm-pack build --release --scope tlaukkan --target node --out-dir pkg/node
 wasm-pack build --release --scope tlaukkan --target web --out-dir pkg/web
 ```
 

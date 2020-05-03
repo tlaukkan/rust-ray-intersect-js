@@ -4,6 +4,8 @@ import * as BABYLON from 'babylonjs';
 // Force loading loaders.
 import * as BABYLON_LOADERS from 'babylonjs-loaders';
 import GLTFLoaderCoordinateSystemMode = BABYLON_LOADERS.GLTFLoaderCoordinateSystemMode;
+import VertexBuffer = BABYLON.VertexBuffer;
+import Mesh = BABYLON.Mesh;
 const gltfLoaderCoordinateSystemMode = GLTFLoaderCoordinateSystemMode;
 
 describe('Test BabylonJS headless.', () => {
@@ -30,6 +32,17 @@ describe('Test BabylonJS headless.', () => {
         console.log("Meshes loaded from gltf file: " + meshes.length);
         for (let index = 0; index < meshes.length; index++) {
           console.log(meshes[index].toString());
+          console.log(typeof(meshes[index].getIndices()));
+          /*const indices = meshes[index].getIndices();
+          if (!indices) {
+            throw new Error("No indices in mesh.");
+          }
+          console.log(typeof(indices));
+          const positions = (meshes[index] as Mesh).getVerticesData(VertexBuffer.PositionKind, false, false);
+          if (!positions) {
+            throw new Error("No positions in mesh.");
+          }
+          console.log(typeof(positions));*/
         }
 
         console.log("render started")
