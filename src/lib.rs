@@ -25,6 +25,35 @@ pub fn greet() {
 }
 
 #[wasm_bindgen]
+pub fn save_mesh_triangles(
+    mesh_id: &str,
+    indices: js_sys::Uint32Array,
+    positions: js_sys::Float32Array,
+) {
+}
+
+#[wasm_bindgen]
+pub struct Intersection {
+    pub triangle_index: u32,
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+}
+
+#[wasm_bindgen]
+pub fn intersect_vector_with_mesh_triangles(
+    mesh_id: &str,
+    start_x: f32,
+    start_y: f32,
+    start_z: f32,
+    end_x: f32,
+    end_y: f32,
+    end_z: f32,
+) -> Option<Intersection> {
+    return None;
+}
+
+#[wasm_bindgen]
 pub fn add(a: f64, b: f64) -> f64 {
     a + b
 }

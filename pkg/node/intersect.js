@@ -88,6 +88,34 @@ module.exports.greet = function() {
 };
 
 /**
+* @param {string} mesh_id
+* @param {Uint32Array} indices
+* @param {Float32Array} positions
+*/
+module.exports.save_mesh_triangles = function(mesh_id, indices, positions) {
+    var ptr0 = passStringToWasm0(mesh_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    var len0 = WASM_VECTOR_LEN;
+    wasm.save_mesh_triangles(ptr0, len0, addHeapObject(indices), addHeapObject(positions));
+};
+
+/**
+* @param {string} mesh_id
+* @param {number} start_x
+* @param {number} start_y
+* @param {number} start_z
+* @param {number} end_x
+* @param {number} end_y
+* @param {number} end_z
+* @returns {Intersection | undefined}
+*/
+module.exports.intersect_vector_with_mesh_triangles = function(mesh_id, start_x, start_y, start_z, end_x, end_y, end_z) {
+    var ptr0 = passStringToWasm0(mesh_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    var len0 = WASM_VECTOR_LEN;
+    var ret = wasm.intersect_vector_with_mesh_triangles(ptr0, len0, start_x, start_y, start_z, end_x, end_y, end_z);
+    return ret === 0 ? undefined : Intersection.__wrap(ret);
+};
+
+/**
 * @param {number} a
 * @param {number} b
 * @returns {number}
@@ -133,6 +161,78 @@ module.exports.test_float_64_array = function(array) {
     var ret = wasm.test_float_64_array(addHeapObject(array));
     return ret >>> 0;
 };
+
+/**
+*/
+class Intersection {
+
+    static __wrap(ptr) {
+        const obj = Object.create(Intersection.prototype);
+        obj.ptr = ptr;
+
+        return obj;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+
+        wasm.__wbg_intersection_free(ptr);
+    }
+    /**
+    * @returns {number}
+    */
+    get triangle_index() {
+        var ret = wasm.__wbg_get_intersection_triangle_index(this.ptr);
+        return ret >>> 0;
+    }
+    /**
+    * @param {number} arg0
+    */
+    set triangle_index(arg0) {
+        wasm.__wbg_set_intersection_triangle_index(this.ptr, arg0);
+    }
+    /**
+    * @returns {number}
+    */
+    get x() {
+        var ret = wasm.__wbg_get_intersection_x(this.ptr);
+        return ret;
+    }
+    /**
+    * @param {number} arg0
+    */
+    set x(arg0) {
+        wasm.__wbg_set_intersection_x(this.ptr, arg0);
+    }
+    /**
+    * @returns {number}
+    */
+    get y() {
+        var ret = wasm.__wbg_get_intersection_y(this.ptr);
+        return ret;
+    }
+    /**
+    * @param {number} arg0
+    */
+    set y(arg0) {
+        wasm.__wbg_set_intersection_y(this.ptr, arg0);
+    }
+    /**
+    * @returns {number}
+    */
+    get z() {
+        var ret = wasm.__wbg_get_intersection_z(this.ptr);
+        return ret;
+    }
+    /**
+    * @param {number} arg0
+    */
+    set z(arg0) {
+        wasm.__wbg_set_intersection_z(this.ptr, arg0);
+    }
+}
+module.exports.Intersection = Intersection;
 
 module.exports.__wbindgen_json_serialize = function(arg0, arg1) {
     const obj = getObject(arg1);
