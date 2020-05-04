@@ -16,7 +16,7 @@ serde_derive = "1.0.106"
 serde_json = "1.0.52"
 js-sys = "0.3.39"
 lazy_static = "1.4.0"
-nalgebra = "0.21"
+nalgebra = "0.20"
 bvh = "0.3.2"
 
 # The `console_error_panic_hook` crate provides better debugging of panics by

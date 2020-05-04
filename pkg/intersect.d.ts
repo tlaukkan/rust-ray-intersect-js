@@ -1,29 +1,39 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
-* Initialized panic hook.
+* @param {string} mesh_id 
+* @returns {boolean} 
 */
-export function init_panic_hook(): void;
-/**
-*/
-export function greet(): void;
+export function has_mesh(mesh_id: string): boolean;
 /**
 * @param {string} mesh_id 
 * @param {Uint32Array} indices 
 * @param {Float32Array} positions 
 */
-export function save_mesh_triangles(mesh_id: string, indices: Uint32Array, positions: Float32Array): void;
+export function set_mesh(mesh_id: string, indices: Uint32Array, positions: Float32Array): void;
 /**
 * @param {string} mesh_id 
-* @param {number} start_x 
-* @param {number} start_y 
-* @param {number} start_z 
-* @param {number} end_x 
-* @param {number} end_y 
-* @param {number} end_z 
-* @returns {Intersection | undefined} 
+* @returns {boolean} 
 */
-export function intersect_vector_with_mesh_triangles(mesh_id: string, start_x: number, start_y: number, start_z: number, end_x: number, end_y: number, end_z: number): Intersection | undefined;
+export function remove_mesh(mesh_id: string): boolean;
+/**
+* @param {string} mesh_id 
+* @param {number} origin_x 
+* @param {number} origin_y 
+* @param {number} origin_z 
+* @param {number} direction_x 
+* @param {number} direction_y 
+* @param {number} direction_z 
+* @param {Result} result 
+* @returns {boolean} 
+*/
+export function ray_intersect(mesh_id: string, origin_x: number, origin_y: number, origin_z: number, direction_x: number, direction_y: number, direction_z: number, result: Result): boolean;
+/**
+*/
+export function init_panic_hook(): void;
+/**
+*/
+export function greet(): void;
 /**
 * @param {number} a 
 * @param {number} b 
@@ -53,8 +63,16 @@ export function test_float_32_array(array: Float32Array): number;
 export function test_float_64_array(array: Float64Array): number;
 /**
 */
-export class Intersection {
+export class Result {
   free(): void;
+/**
+* @returns {number} 
+*/
+  distance: number;
+/**
+* @returns {boolean} 
+*/
+  hit: boolean;
 /**
 * @returns {number} 
 */
@@ -62,13 +80,9 @@ export class Intersection {
 /**
 * @returns {number} 
 */
-  x: number;
+  u: number;
 /**
 * @returns {number} 
 */
-  y: number;
-/**
-* @returns {number} 
-*/
-  z: number;
+  v: number;
 }
