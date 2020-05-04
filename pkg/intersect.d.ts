@@ -24,10 +24,10 @@ export function remove_mesh(mesh_id: string): boolean;
 * @param {number} direction_x 
 * @param {number} direction_y 
 * @param {number} direction_z 
-* @param {Result} result 
+* @param {IntersectResult} result 
 * @returns {boolean} 
 */
-export function ray_intersect(mesh_id: string, origin_x: number, origin_y: number, origin_z: number, direction_x: number, direction_y: number, direction_z: number, result: Result): boolean;
+export function ray_intersect(mesh_id: string, origin_x: number, origin_y: number, origin_z: number, direction_x: number, direction_y: number, direction_z: number, result: IntersectResult): boolean;
 /**
 */
 export function init_panic_hook(): void;
@@ -63,7 +63,7 @@ export function test_float_32_array(array: Float32Array): number;
 export function test_float_64_array(array: Float64Array): number;
 /**
 */
-export class Result {
+export class IntersectResult {
   free(): void;
 /**
 */

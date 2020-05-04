@@ -121,13 +121,13 @@ function _assertClass(instance, klass) {
 * @param {number} direction_x
 * @param {number} direction_y
 * @param {number} direction_z
-* @param {Result} result
+* @param {IntersectResult} result
 * @returns {boolean}
 */
 module.exports.ray_intersect = function(mesh_id, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, result) {
     var ptr0 = passStringToWasm0(mesh_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     var len0 = WASM_VECTOR_LEN;
-    _assertClass(result, Result);
+    _assertClass(result, IntersectResult);
     var ret = wasm.ray_intersect(ptr0, len0, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, result.ptr);
     return ret !== 0;
 };
@@ -193,10 +193,10 @@ module.exports.test_float_64_array = function(array) {
 
 /**
 */
-class Result {
+class IntersectResult {
 
     static __wrap(ptr) {
-        const obj = Object.create(Result.prototype);
+        const obj = Object.create(IntersectResult.prototype);
         obj.ptr = ptr;
 
         return obj;
@@ -206,81 +206,81 @@ class Result {
         const ptr = this.ptr;
         this.ptr = 0;
 
-        wasm.__wbg_result_free(ptr);
+        wasm.__wbg_intersectresult_free(ptr);
     }
     /**
     * @returns {boolean}
     */
     get hit() {
-        var ret = wasm.__wbg_get_result_hit(this.ptr);
+        var ret = wasm.__wbg_get_intersectresult_hit(this.ptr);
         return ret !== 0;
     }
     /**
     * @param {boolean} arg0
     */
     set hit(arg0) {
-        wasm.__wbg_set_result_hit(this.ptr, arg0);
+        wasm.__wbg_set_intersectresult_hit(this.ptr, arg0);
     }
     /**
     * @returns {number}
     */
     get triangle_index() {
-        var ret = wasm.__wbg_get_result_triangle_index(this.ptr);
+        var ret = wasm.__wbg_get_intersectresult_triangle_index(this.ptr);
         return ret >>> 0;
     }
     /**
     * @param {number} arg0
     */
     set triangle_index(arg0) {
-        wasm.__wbg_set_result_triangle_index(this.ptr, arg0);
+        wasm.__wbg_set_intersectresult_triangle_index(this.ptr, arg0);
     }
     /**
     * @returns {number}
     */
     get u() {
-        var ret = wasm.__wbg_get_result_u(this.ptr);
+        var ret = wasm.__wbg_get_intersectresult_u(this.ptr);
         return ret;
     }
     /**
     * @param {number} arg0
     */
     set u(arg0) {
-        wasm.__wbg_set_result_u(this.ptr, arg0);
+        wasm.__wbg_set_intersectresult_u(this.ptr, arg0);
     }
     /**
     * @returns {number}
     */
     get v() {
-        var ret = wasm.__wbg_get_result_v(this.ptr);
+        var ret = wasm.__wbg_get_intersectresult_v(this.ptr);
         return ret;
     }
     /**
     * @param {number} arg0
     */
     set v(arg0) {
-        wasm.__wbg_set_result_v(this.ptr, arg0);
+        wasm.__wbg_set_intersectresult_v(this.ptr, arg0);
     }
     /**
     * @returns {number}
     */
     get distance() {
-        var ret = wasm.__wbg_get_result_distance(this.ptr);
+        var ret = wasm.__wbg_get_intersectresult_distance(this.ptr);
         return ret;
     }
     /**
     * @param {number} arg0
     */
     set distance(arg0) {
-        wasm.__wbg_set_result_distance(this.ptr, arg0);
+        wasm.__wbg_set_intersectresult_distance(this.ptr, arg0);
     }
     /**
     */
     constructor() {
-        var ret = wasm.result_new();
-        return Result.__wrap(ret);
+        var ret = wasm.intersectresult_new();
+        return IntersectResult.__wrap(ret);
     }
 }
-module.exports.Result = Result;
+module.exports.IntersectResult = IntersectResult;
 
 module.exports.__wbindgen_object_drop_ref = function(arg0) {
     takeObject(arg0);

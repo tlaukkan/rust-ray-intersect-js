@@ -23,7 +23,7 @@ extern "C" {
 }
 
 #[wasm_bindgen]
-pub struct Result {
+pub struct IntersectResult {
     pub hit: bool,
     pub triangle_index: u32,
     pub u: f32,
@@ -32,10 +32,10 @@ pub struct Result {
 }
 
 #[wasm_bindgen]
-impl Result {
+impl IntersectResult {
     #[wasm_bindgen(constructor)]
-    pub fn new() -> Result {
-        Result {
+    pub fn new() -> IntersectResult {
+        IntersectResult {
             hit: false,
             triangle_index: 0,
             u: 0.0,
@@ -134,7 +134,7 @@ pub fn ray_intersect(
     direction_x: f32,
     direction_y: f32,
     direction_z: f32,
-    result: &mut Result,
+    result: &mut IntersectResult,
 ) -> bool {
     let map = HASHMAP.lock().unwrap();
     let key = mesh_id.to_string();
@@ -284,7 +284,7 @@ mod tests {
 
         assert_eq!(has_mesh(mesh_id), true);
 
-        let mut result = Result {
+        let mut result = IntersectResult {
             hit: false,
             triangle_index: 0,
             u: 0.0,

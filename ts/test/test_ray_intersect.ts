@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {init_panic_hook, ray_intersect, set_mesh, has_mesh, remove_mesh, Result} from 'rust-ray-intersect';
+import {init_panic_hook, ray_intersect, set_mesh, has_mesh, remove_mesh, IntersectResult} from 'rust-ray-intersect';
 
 describe('Test ray intersect.', () => {
 
@@ -32,12 +32,11 @@ describe('Test ray intersect.', () => {
 
     expect(has_mesh(meshId)).eq(true);
 
-    const result: Result = new Result();
+    const result: IntersectResult = new IntersectResult();
     expect(ray_intersect(meshId, 0.5, 0.5, 0.5, 0, 0, -1, result)).eq(true);
-
     expect(result.hit).eq(true);
-
     expect(result.distance).eq(0.5);
+    result.free();
 
     expect(remove_mesh(meshId)).eq(true);
 
