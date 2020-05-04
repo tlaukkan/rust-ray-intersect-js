@@ -34,12 +34,12 @@ describe('Test ray intersect.', () => {
 
     const result: IntersectResult = new IntersectResult();
     expect(ray_intersect(meshId, 0.5, 0.5, 0.5, 0, 0, -1, result)).eq(true);
+    expect(result.triangle_index).eq(0);
     expect(result.hit).eq(true);
     expect(result.distance).eq(0.5);
     result.free();
 
     expect(remove_mesh(meshId)).eq(true);
-
     expect(has_mesh(meshId)).eq(false);
 
   }).timeout(10000);
