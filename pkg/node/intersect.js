@@ -195,6 +195,13 @@ module.exports.test_float_64_array = function(array) {
 */
 class Result {
 
+    static __wrap(ptr) {
+        const obj = Object.create(Result.prototype);
+        obj.ptr = ptr;
+
+        return obj;
+    }
+
     free() {
         const ptr = this.ptr;
         this.ptr = 0;
@@ -265,6 +272,12 @@ class Result {
     */
     set distance(arg0) {
         wasm.__wbg_set_result_distance(this.ptr, arg0);
+    }
+    /**
+    */
+    constructor() {
+        var ret = wasm.result_new();
+        return Result.__wrap(ret);
     }
 }
 module.exports.Result = Result;

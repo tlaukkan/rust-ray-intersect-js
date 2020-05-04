@@ -66,6 +66,9 @@ export function test_float_64_array(array: Float64Array): number;
 export class Result {
   free(): void;
 /**
+*/
+  constructor();
+/**
 * @returns {number} 
 */
   distance: number;

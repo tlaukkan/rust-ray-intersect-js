@@ -31,6 +31,19 @@ pub struct Result {
     pub distance: f32,
 }
 
+#[wasm_bindgen]
+impl Result {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> Result {
+        Result {
+            hit: false,
+            triangle_index: 0,
+            u: 0.0,
+            v: 0.0,
+            distance: 0.0,
+        }
+    }
+}
 pub struct Mesh {
     pub bvh: BVH,
     pub triangles: Vec<Triangle>,
@@ -278,6 +291,7 @@ mod tests {
             v: 0.0,
             distance: 0.0,
         };
+
         assert_eq!(
             ray_intersect(mesh_id, 0.5, 0.5, 0.5, 0.0, 0.0, -1.0, &mut result),
             true
