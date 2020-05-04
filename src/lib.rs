@@ -2,7 +2,7 @@
 extern crate lazy_static;
 
 use bvh::aabb::{Bounded, AABB};
-use bvh::bounding_hierarchy::{BHShape, BoundingHierarchy};
+use bvh::bounding_hierarchy::BHShape;
 use bvh::bvh::BVH;
 use bvh::ray::Ray;
 use js_sys;
@@ -17,78 +17,8 @@ use wasm_bindgen::prelude::*;
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-#[wasm_bindgen]
-extern "C" {
-    fn alert(s: &str);
-}
-
-#[wasm_bindgen]
-pub struct IntersectResult {
-    pub hit: bool,
-    pub triangle_index: u32,
-    pub u: f32,
-    pub v: f32,
-    pub distance: f32,
-}
-
-#[wasm_bindgen]
-impl IntersectResult {
-    #[wasm_bindgen(constructor)]
-    pub fn new() -> IntersectResult {
-        IntersectResult {
-            hit: false,
-            triangle_index: 0,
-            u: 0.0,
-            v: 0.0,
-            distance: 0.0,
-        }
-    }
-}
-pub struct Mesh {
-    pub bvh: BVH,
-    pub triangles: Vec<Triangle>,
-}
-
-impl Mesh {
-    pub fn new(mesh_id: String, indices: Vec<u32>, positions: Vec<f32>) -> Mesh {
-        let mut triangles: Vec<Triangle> = Vec::new();
-        let mut index: u32 = 0;
-        for i in (0..indices.len()).step_by(3) {
-            let ai = indices[i];
-            let bi = indices[i + 1];
-            let ci = indices[i + 2];
-            triangles.push(Triangle::new(
-                index,
-                Point3::new(
-                    positions[indices[i] as usize * 3],
-                    positions[indices[i] as usize * 3 + 1],
-                    positions[indices[i] as usize * 3 + 2],
-                ),
-                Point3::new(
-                    positions[indices[i + 1] as usize * 3],
-                    positions[indices[i + 1] as usize * 3 + 1],
-                    positions[indices[i + 1] as usize * 3 + 2],
-                ),
-                Point3::new(
-                    positions[indices[i + 2] as usize],
-                    positions[indices[i + 2] as usize * 3 + 1],
-                    positions[indices[i + 2] as usize * 3 + 2],
-                ),
-            ));
-            index = index + 1;
-        }
-
-        let bvh: BVH = BVH::build(&mut triangles);
-
-        Mesh { bvh, triangles }
-    }
-}
-
 lazy_static! {
-    static ref HASHMAP: Mutex<HashMap<String, Mesh>> = {
-        let mut m = HashMap::new();
-        Mutex::new(m)
-    };
+    static ref HASHMAP: Mutex<HashMap<String, Mesh>> = { Mutex::new(HashMap::new()) };
 }
 
 #[wasm_bindgen]
@@ -139,7 +69,7 @@ pub fn ray_intersect(
     let map = HASHMAP.lock().unwrap();
     let key = mesh_id.to_string();
     if !map.contains_key(&key) {
-        return true;
+        return false;
     }
 
     let mesh: &Mesh = map.get(&key).unwrap();
@@ -148,27 +78,11 @@ pub fn ray_intersect(
     let direction = Vector3::new(direction_x, direction_y, direction_z);
     let ray = Ray::new(origin, direction);
 
-    println!("tris: {}", mesh.triangles.len());
-
     let hits = &mesh.bvh.traverse(&ray, &mesh.triangles);
-    println!("hits: {}", hits.len());
 
     result.distance = f32::INFINITY;
     for triangle in hits {
-        println!("candidate tri a x: {}", &triangle.a.coords[0]);
-        println!("candidate tri a y: {}", &triangle.a.coords[1]);
-        println!("candidate tri a z: {}", &triangle.a.coords[2]);
-
-        println!("candidate tri b x: {}", &triangle.b.coords[0]);
-        println!("candidate tri b y: {}", &triangle.b.coords[1]);
-        println!("candidate tri b z: {}", &triangle.b.coords[2]);
-
-        println!("candidate tri c x: {}", &triangle.c.coords[0]);
-        println!("candidate tri c y: {}", &triangle.c.coords[1]);
-        println!("candidate tri c z: {}", &triangle.c.coords[2]);
-
         let candidate = ray.intersects_triangle(&triangle.a, &triangle.b, &triangle.c);
-        println!("candidate distance: {}", candidate.distance);
         if candidate.distance < result.distance {
             result.hit = true;
             result.distance = candidate.distance;
@@ -187,6 +101,72 @@ pub fn init_panic_hook() {
     console_error_panic_hook::set_once();
 }
 
+#[wasm_bindgen]
+pub struct IntersectResult {
+    pub hit: bool,
+    pub triangle_index: u32,
+    pub u: f32,
+    pub v: f32,
+    pub distance: f32,
+}
+
+#[wasm_bindgen]
+impl IntersectResult {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> IntersectResult {
+        IntersectResult {
+            hit: false,
+            triangle_index: 0,
+            u: 0.0,
+            v: 0.0,
+            distance: 0.0,
+        }
+    }
+}
+
+pub struct Mesh {
+    pub mesh_id: String,
+    pub bvh: BVH,
+    pub triangles: Vec<Triangle>,
+}
+
+impl Mesh {
+    pub fn new(mesh_id: String, indices: Vec<u32>, positions: Vec<f32>) -> Mesh {
+        let mut triangles: Vec<Triangle> = Vec::new();
+        let mut index: u32 = 0;
+
+        for i in (0..indices.len()).step_by(3) {
+            triangles.push(Triangle::new(
+                index,
+                Point3::new(
+                    positions[indices[i] as usize * 3],
+                    positions[indices[i] as usize * 3 + 1],
+                    positions[indices[i] as usize * 3 + 2],
+                ),
+                Point3::new(
+                    positions[indices[i + 1] as usize * 3],
+                    positions[indices[i + 1] as usize * 3 + 1],
+                    positions[indices[i + 1] as usize * 3 + 2],
+                ),
+                Point3::new(
+                    positions[indices[i + 2] as usize],
+                    positions[indices[i + 2] as usize * 3 + 1],
+                    positions[indices[i + 2] as usize * 3 + 2],
+                ),
+            ));
+            index = index + 1;
+        }
+
+        let bvh: BVH = BVH::build(&mut triangles);
+
+        Mesh {
+            mesh_id,
+            bvh,
+            triangles,
+        }
+    }
+}
+
 pub struct Triangle {
     pub index: u32,
     pub a: Point3<f32>,
@@ -199,10 +179,10 @@ pub struct Triangle {
 impl Triangle {
     pub fn new(index: u32, a: Point3<f32>, b: Point3<f32>, c: Point3<f32>) -> Triangle {
         Triangle {
-            index: index,
-            a: a,
-            b: b,
-            c: c,
+            index,
+            a,
+            b,
+            c,
             aabb: AABB::empty().grow(&a).grow(&b).grow(&c),
             node_index: 0,
         }
@@ -224,47 +204,6 @@ impl BHShape for Triangle {
         self.node_index
     }
 }
-
-// -------------------------------------------------------------------------------------------------
-// Interface test code starts from here ------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-
-#[wasm_bindgen]
-pub fn greet() {
-    alert("Hello, rust-ray-intersect-js!");
-}
-
-#[wasm_bindgen]
-pub fn add(a: f64, b: f64) -> f64 {
-    a + b
-}
-
-#[wasm_bindgen]
-pub fn bad_add(a: f64, b: f64) -> f64 {
-    a - b
-}
-
-#[wasm_bindgen]
-pub fn test_number_array(array: JsValue) -> usize {
-    let elements: Vec<u32> = array.into_serde().unwrap();
-    return elements.len();
-}
-
-#[wasm_bindgen]
-pub fn test_float_32_array(array: js_sys::Float32Array) -> usize {
-    let elements: Vec<f32> = array.to_vec();
-    return elements.len();
-}
-
-#[wasm_bindgen]
-pub fn test_float_64_array(array: js_sys::Float64Array) -> usize {
-    let elements: Vec<f64> = array.to_vec();
-    return elements.len();
-}
-
-// -------------------------------------------------------------------------------------------------
-// Unit tests --------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
 
 #[cfg(test)]
 mod tests {

@@ -31,8 +31,6 @@ describe('Test BabylonJS headless.', () => {
       BABYLON.SceneLoader.ImportMesh("", "https://www.babylonjs.com/Assets/DamagedHelmet/glTF/", "DamagedHelmet.gltf", scene, function (meshes) {
         console.log("Meshes loaded from gltf file: " + meshes.length);
         for (let index = 0; index < meshes.length; index++) {
-          console.log(meshes[index].toString());
-          console.log(typeof(meshes[index].getIndices()));
           /*const indices = meshes[index].getIndices();
           if (!indices) {
             throw new Error("No indices in mesh.");
