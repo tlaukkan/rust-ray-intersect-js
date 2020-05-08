@@ -1,0 +1,24 @@
+{
+  "name": "ts-ray-intersect",
+  "version": "1.0.0",
+  "dependencies": {
+    "babylonjs": "4.2.0-alpha.13",
+    "babylonjs-loaders": "4.2.0-alpha.13",
+    "rust-ray-intersect": "file:../../pkg",
+    "tslib": "^1.10.0",
+    "xhr2": "^0.2.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.0.12",
+    "@types/webpack-env": "^1.15.2",
+    "chai": "^4.2.0",
+    "mocha": "*",
+    "ts-loader": "^7.0.3",
+    "ts-node": "^8.9.1",
+    "typescript": "^3.8.3",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
+  }
+}
