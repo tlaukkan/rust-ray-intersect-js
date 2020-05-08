@@ -83,10 +83,10 @@ pub fn ray_intersect(
     result.distance = f32::INFINITY;
     for triangle in hits {
         let candidate = ray.intersects_triangle(&triangle.a, &triangle.b, &triangle.c);
-        println!(
+        /*println!(
             "candidate triangle {} at {}",
             triangle.index, candidate.distance
-        );
+        );*/
         if candidate.distance < result.distance {
             result.hit = true;
             result.distance = candidate.distance;
@@ -158,7 +158,7 @@ impl Mesh {
                     positions[indices[i + 2] as usize * 3 + 0],
                 ),
             );
-            println!(
+            /*println!(
                 "triangle #{} ({},{},{}) ({},{},{}) ({},{},{}) ",
                 triangle.index,
                 triangle.a[0],
@@ -170,7 +170,7 @@ impl Mesh {
                 triangle.c[0],
                 triangle.c[1],
                 triangle.c[2],
-            );
+            );*/
 
             triangles.push(triangle);
 
