@@ -24,10 +24,9 @@ export function remove_mesh(mesh_id: string): boolean;
 * @param {number} direction_x 
 * @param {number} direction_y 
 * @param {number} direction_z 
-* @param {IntersectResult} result 
-* @returns {boolean} 
+* @returns {Array<any>} 
 */
-export function ray_intersect(mesh_id: string, origin_x: number, origin_y: number, origin_z: number, direction_x: number, direction_y: number, direction_z: number, result: IntersectResult): boolean;
+export function ray_intersect(mesh_id: string, origin_x: number, origin_y: number, origin_z: number, direction_x: number, direction_y: number, direction_z: number): Array<any>;
 /**
 */
 export function init_panic_hook(): void;
@@ -50,12 +49,4 @@ export class IntersectResult {
 * @returns {number} 
 */
   triangle_index: number;
-/**
-* @returns {number} 
-*/
-  u: number;
-/**
-* @returns {number} 
-*/
-  v: number;
 }

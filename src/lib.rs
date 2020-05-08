@@ -1,15 +1,16 @@
 #[macro_use]
 extern crate lazy_static;
+extern crate js_sys;
+extern crate wasm_bindgen;
+use wasm_bindgen::prelude::*;
 
 use bvh::aabb::{Bounded, AABB};
 use bvh::bounding_hierarchy::BHShape;
 use bvh::bvh::BVH;
 use bvh::ray::Ray;
-use js_sys;
 use nalgebra::{Point3, Vector3};
 use std::collections::HashMap;
 use std::sync::Mutex;
-use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -47,12 +48,12 @@ fn _set_mesh(mesh_id: &str, indices: Vec<u32>, positions: Vec<f32>) {
 pub fn remove_mesh(mesh_id: &str) -> bool {
     let mut map = HASHMAP.lock().unwrap();
     let key = mesh_id.to_string();
-    return if map.contains_key(&key) {
+    if map.contains_key(&key) {
         map.remove(&key);
         true
     } else {
         false
-    };
+    }
 }
 
 #[wasm_bindgen]
@@ -64,39 +65,32 @@ pub fn ray_intersect(
     direction_x: f32,
     direction_y: f32,
     direction_z: f32,
-    result: &mut IntersectResult,
-) -> bool {
+) -> js_sys::Array {
+    let mut intercepts = vec![];
+
     let map = HASHMAP.lock().unwrap();
     let key = mesh_id.to_string();
-    if !map.contains_key(&key) {
-        return false;
-    }
+    if map.contains_key(&key) {
+        let mesh: &Mesh = map.get(&key).unwrap();
 
-    let mesh: &Mesh = map.get(&key).unwrap();
+        let origin = Point3::new(origin_x, origin_y, origin_z);
+        let direction = Vector3::new(direction_x, direction_y, direction_z);
+        let ray = Ray::new(origin, direction);
+        let hits = &mesh.bvh.traverse(&ray, &mesh.triangles);
 
-    let origin = Point3::new(origin_x, origin_y, origin_z);
-    let direction = Vector3::new(direction_x, direction_y, direction_z);
-    let ray = Ray::new(origin, direction);
+        for triangle in hits {
+            let candidate = ray.intersects_triangle(&triangle.a, &triangle.b, &triangle.c);
+            let mut result: IntersectResult = IntersectResult::new();
 
-    let hits = &mesh.bvh.traverse(&ray, &mesh.triangles);
-
-    result.distance = f32::INFINITY;
-    for triangle in hits {
-        let candidate = ray.intersects_triangle(&triangle.a, &triangle.b, &triangle.c);
-        /*println!(
-            "candidate triangle {} at {}",
-            triangle.index, candidate.distance
-        );*/
-        if candidate.distance < result.distance {
             result.hit = true;
             result.distance = candidate.distance;
-            result.u = candidate.u;
-            result.v = candidate.v;
             result.triangle_index = triangle.index;
+
+            intercepts.push(result);
         }
     }
 
-    return result.hit;
+    intercepts.into_iter().map(JsValue::from).collect()
 }
 
 #[wasm_bindgen]
@@ -109,8 +103,6 @@ pub fn init_panic_hook() {
 pub struct IntersectResult {
     pub hit: bool,
     pub triangle_index: u32,
-    pub u: f32,
-    pub v: f32,
     pub distance: f32,
 }
 
@@ -121,8 +113,6 @@ impl IntersectResult {
         IntersectResult {
             hit: false,
             triangle_index: 0,
-            u: 0.0,
-            v: 0.0,
             distance: 0.0,
         }
     }
@@ -137,44 +127,30 @@ pub struct Mesh {
 impl Mesh {
     pub fn new(mesh_id: String, indices: Vec<u32>, positions: Vec<f32>) -> Mesh {
         let mut triangles: Vec<Triangle> = Vec::new();
-        let mut index: u32 = 0;
+        let mut index: usize = 0;
 
         for i in (0..indices.len()).step_by(3) {
             let triangle = Triangle::new(
-                index,
+                index as u32,
                 Point3::new(
-                    positions[indices[i + 0] as usize * 3 + 2],
-                    positions[indices[i + 0] as usize * 3 + 1],
-                    positions[indices[i + 0] as usize * 3 + 0],
+                    positions[indices[i] as usize * 3 + 2],
+                    positions[indices[i] as usize * 3 + 1],
+                    positions[indices[i] as usize * 3],
                 ),
                 Point3::new(
                     positions[indices[i + 1] as usize * 3 + 2],
                     positions[indices[i + 1] as usize * 3 + 1],
-                    positions[indices[i + 1] as usize * 3 + 0],
+                    positions[indices[i + 1] as usize * 3],
                 ),
                 Point3::new(
                     positions[indices[i + 2] as usize * 3 + 2],
                     positions[indices[i + 2] as usize * 3 + 1],
-                    positions[indices[i + 2] as usize * 3 + 0],
+                    positions[indices[i + 2] as usize * 3],
                 ),
             );
-            /*println!(
-                "triangle #{} ({},{},{}) ({},{},{}) ({},{},{}) ",
-                triangle.index,
-                triangle.a[0],
-                triangle.a[1],
-                triangle.a[2],
-                triangle.b[0],
-                triangle.b[1],
-                triangle.b[2],
-                triangle.c[0],
-                triangle.c[1],
-                triangle.c[2],
-            );*/
-
             triangles.push(triangle);
 
-            index = index + 1;
+            index += 1;
         }
 
         let bvh: BVH = BVH::build(&mut triangles);
@@ -252,21 +228,15 @@ mod tests {
 
         assert_eq!(has_mesh(mesh_id), true);
 
-        let mut result = IntersectResult {
-            hit: false,
-            triangle_index: 0,
-            u: 0.0,
-            v: 0.0,
-            distance: 0.0,
-        };
+        let result: js_sys::Array = ray_intersect(mesh_id, 0.0, 1.0, 0.0, 0.0, -1.0, 0.0);
 
         assert_eq!(
-            ray_intersect(mesh_id, 0.0, 1.0, 0.0, 0.0, -1.0, 0.0, &mut result),
+            ray_intersect(mesh_id, 0.0, 1.0, 0.0, 0.0, -1.0, 0.0).length,
             true
         );
 
-        assert_eq!(result.hit, true);
-        assert_eq!(result.distance, 0.5);
+        assert_eq!(result.get(0).hit, true);
+        assert_eq!(result.get(0).distance, 0.5);
 
         assert_eq!(remove_mesh(mesh_id), true);
 
