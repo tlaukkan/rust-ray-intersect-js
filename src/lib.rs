@@ -18,7 +18,7 @@ use wasm_bindgen::prelude::*;
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 lazy_static! {
-    static ref HASHMAP: Mutex<HashMap<String, Mesh>> = { Mutex::new(HashMap::new()) };
+    static ref HASHMAP: Mutex<HashMap<String, Mesh>> = Mutex::new(HashMap::new());
 }
 
 #[wasm_bindgen]

@@ -53,12 +53,11 @@ describe('Test ray intersect.', () => {
 
                 let position_intersect: Vector3 = get_3d_position(Origin, Direction, MaxDistance, meshId);
                 const t0 = Date.now()
-                for (let i = 0; i < 1000; i++) {
+                for (let i = 0; i < 10000; i++) {
                     position_intersect = get_3d_position(Origin, Direction, MaxDistance, meshId);
                 }
                 const t1 = Date.now()
-                console.log(`Rusty intersect took ${t1 - t0} milliseconds. Intersected at ${position_intersect.x}
-                ,${position_intersect.y},${position_intersect.z}`)
+                console.log(`Rusty      intersect took ${t1 - t0} milliseconds. Intersected at {X:${position_intersect.x} Y: ${position_intersect.z} Z: ${position_intersect.y}}`)
 
                 //
                 expect(remove_mesh(meshId)).eq(true);
@@ -73,7 +72,7 @@ describe('Test ray intersect.', () => {
                 let hit = (meshes[index] as Mesh).intersects(ray, false);
 
                 const t2 = Date.now();
-                for (let i = 0; i < 1000; i++) {
+                for (let i = 0; i < 10000; i++) {
                     hit = (meshes[index] as Mesh).intersects(ray, false);
                 }
                 const t3 = Date.now()

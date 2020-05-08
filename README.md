@@ -1,8 +1,10 @@
-#For Babylonjs Forum test
+### For Babylonjs Forum test
 ```
-1) Ensure you have wasm-pack
-2) Ensure you have chai
-3) Run speedtest_wasm_vs_babylon.sh
+
+1) Install Rust (https://www.rust-lang.org/tools/install)
+2) Install Wasm-Pack  (https://rustwasm.github.io/wasm-pack/installer/)
+3) Run speedtest_wasm_vs_babylon.sh (Note: May take a while to get all of the rust items you need)
+
 ```
 # rust-ray-intersect-js
 
