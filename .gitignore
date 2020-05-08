@@ -2,5 +2,6 @@
 **/*.rs.bk
 Cargo.lock
 bin/
+pkg2/
 wasm-pack.log
 .cargo-ok

@@ -83,6 +83,10 @@ pub fn ray_intersect(
     result.distance = f32::INFINITY;
     for triangle in hits {
         let candidate = ray.intersects_triangle(&triangle.a, &triangle.b, &triangle.c);
+        println!(
+            "candidate triangle {} at {}",
+            triangle.index, candidate.distance
+        );
         if candidate.distance < result.distance {
             result.hit = true;
             result.distance = candidate.distance;
@@ -136,24 +140,40 @@ impl Mesh {
         let mut index: u32 = 0;
 
         for i in (0..indices.len()).step_by(3) {
-            triangles.push(Triangle::new(
+            let triangle = Triangle::new(
                 index,
                 Point3::new(
-                    positions[indices[i] as usize * 3],
-                    positions[indices[i] as usize * 3 + 1],
-                    positions[indices[i] as usize * 3 + 2],
+                    positions[indices[i + 0] as usize * 3 + 2],
+                    positions[indices[i + 0] as usize * 3 + 1],
+                    positions[indices[i + 0] as usize * 3 + 0],
                 ),
                 Point3::new(
-                    positions[indices[i + 1] as usize * 3],
-                    positions[indices[i + 1] as usize * 3 + 1],
                     positions[indices[i + 1] as usize * 3 + 2],
+                    positions[indices[i + 1] as usize * 3 + 1],
+                    positions[indices[i + 1] as usize * 3 + 0],
                 ),
                 Point3::new(
-                    positions[indices[i + 2] as usize],
-                    positions[indices[i + 2] as usize * 3 + 1],
                     positions[indices[i + 2] as usize * 3 + 2],
+                    positions[indices[i + 2] as usize * 3 + 1],
+                    positions[indices[i + 2] as usize * 3 + 0],
                 ),
-            ));
+            );
+            println!(
+                "triangle #{} ({},{},{}) ({},{},{}) ({},{},{}) ",
+                triangle.index,
+                triangle.a[0],
+                triangle.a[1],
+                triangle.a[2],
+                triangle.b[0],
+                triangle.b[1],
+                triangle.b[2],
+                triangle.c[0],
+                triangle.c[1],
+                triangle.c[2],
+            );
+
+            triangles.push(triangle);
+
             index = index + 1;
         }
 
@@ -214,8 +234,17 @@ mod tests {
     #[test]
     fn test_ray_intersect() {
         let mesh_id = "test";
-        let indices: Vec<u32> = vec![0, 1, 2];
-        let positions: Vec<f32> = vec![0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 4.0, 0.0];
+        let indices: Vec<u32> = vec![
+            0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15, 16,
+            17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23,
+        ];
+        let positions: Vec<f32> = vec![
+            0.5, -0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5,
+            0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5,
+            -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5,
+            -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5,
+            0.5, -0.5, -0.5, -0.5, -0.5, -0.5, -0.5, -0.5, 0.5,
+        ];
 
         assert_eq!(has_mesh(mesh_id), false);
 
@@ -232,12 +261,11 @@ mod tests {
         };
 
         assert_eq!(
-            ray_intersect(mesh_id, 0.5, 0.5, 0.5, 0.0, 0.0, -1.0, &mut result),
+            ray_intersect(mesh_id, 0.0, 1.0, 0.0, 0.0, -1.0, 0.0, &mut result),
             true
         );
 
         assert_eq!(result.hit, true);
-        assert_eq!(result.triangle_index, 0);
         assert_eq!(result.distance, 0.5);
 
         assert_eq!(remove_mesh(mesh_id), true);
