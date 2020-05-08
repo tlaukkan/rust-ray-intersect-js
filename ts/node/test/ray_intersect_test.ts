@@ -51,7 +51,7 @@ describe('Test ray intersect.', () => {
                 const meshId = 'test2-mesh';
                 set_mesh(meshId, new Uint32Array(indices), position as Float32Array);
 
-                let position_intersect: Vector3 =get_3d_position(Origin, Direction, MaxDistance, meshId);
+                let position_intersect: Vector3 = get_3d_position(Origin, Direction, MaxDistance, meshId);
                 const t0 = Date.now()
                 for (let i = 0; i < 1000; i++) {
                     position_intersect = get_3d_position(Origin, Direction, MaxDistance, meshId);
@@ -63,16 +63,17 @@ describe('Test ray intersect.', () => {
                 //
                 expect(remove_mesh(meshId)).eq(true);
                 expect(has_mesh(meshId)).eq(false);
-                //
+
+
+                // Time Babylonjs raycast.
                 (meshes[index] as Mesh).useOctreeForPicking = true;
                 (meshes[index] as Mesh).useOctreeForCollisions = true;
                 (meshes[index] as Mesh).useOctreeForRenderingSelection = true;
                 const ray = new BABYLON.Ray(Origin,Direction,MaxDistance);
-                const t2 = Date.now();
-
                 let hit = (meshes[index] as Mesh).intersects(ray, false);
+
+                const t2 = Date.now();
                 for (let i = 0; i < 1000; i++) {
-                    const ray = new BABYLON.Ray(new BABYLON.Vector3(0, 0, 0), new BABYLON.Vector3(0, -1, 0), Infinity);
                     hit = (meshes[index] as Mesh).intersects(ray, false);
                 }
                 const t3 = Date.now()

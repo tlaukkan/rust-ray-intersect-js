@@ -1,6 +1,5 @@
 /* tslint:disable */
 /* eslint-disable */
-export function init(): Promise<void>;
 /**
 * @param {string} mesh_id 
 * @returns {boolean} 

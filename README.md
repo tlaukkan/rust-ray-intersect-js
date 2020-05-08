@@ -1,3 +1,9 @@
+#For Babylonjs Forum test
+```
+1) Ensure you have wasm-pack
+2) Ensure you have chai
+3) Run speedtest_wasm_vs_babylon.sh
+```
 # rust-ray-intersect-js
 
 Sandbox project for ray intersect implementation with Rust for JavaScript.
@@ -53,4 +59,3 @@ cargo install cargo-generate --features vendored-openssl
 cargo generate --git https://github.com/rustwasm/wasm-pack-template.git --name rust-ray-intersect-js
 ```
     
- 
