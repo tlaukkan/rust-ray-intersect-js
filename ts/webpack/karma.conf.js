@@ -1,4 +1,5 @@
 const path = require('path');
+const webpackConfig = require('./webpack.config.js');
 
 module.exports = (config) => {
     config.set({
@@ -9,32 +10,12 @@ module.exports = (config) => {
         ],
 
         preprocessors: {
-            'test/**/*_test.ts': ['webpack'],
+            'test/**/*_test.ts': [ 'webpack'],
         },
 
-        browsers: ['ChromeHeadless', 'Firefox'],
+        browsers: [],
 
-        webpack: {
-            mode: 'development',
-            entry: './src/index.ts',
-            devtool: 'inline-source-map',
-            module: {
-                rules: [
-                    {
-                        test: /\.tsx?$/,
-                        use: 'ts-loader',
-                        exclude: /node_modules/,
-                    },
-                ],
-            },
-            resolve: {
-                extensions: [ '.ts', '.js' ],
-            },
-            output: {
-                filename: 'bundle.js',
-                path: path.resolve(__dirname, 'dist'),
-            },
-        },
+        webpack: webpackConfig,
 
         webpackMiddleware: {
             stats: 'errors-only',

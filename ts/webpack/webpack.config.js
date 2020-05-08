@@ -11,6 +11,11 @@ module.exports = {
                 use: 'ts-loader',
                 exclude: /node_modules/,
             },
+            {
+                test: /\.wasm$/,
+                type: 'javascript/auto',
+                loader: 'base64-loader'
+            }
         ],
     },
     resolve: {
