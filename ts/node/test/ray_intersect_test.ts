@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {init_panic_hook, ray_intersect, set_mesh, has_mesh, remove_mesh, IntersectResult} from 'rust-ray-intersect';
+import {has_mesh, init_panic_hook, IntersectResult, ray_intersect, remove_mesh, set_mesh} from 'rust-ray-intersect';
 
 import * as BABYLON from 'babylonjs';
 // Force loading loaders.
@@ -7,8 +7,17 @@ import * as BABYLON_LOADERS from 'babylonjs-loaders';
 import GLTFLoaderCoordinateSystemMode = BABYLON_LOADERS.GLTFLoaderCoordinateSystemMode;
 import VertexBuffer = BABYLON.VertexBuffer;
 import Mesh = BABYLON.Mesh;
+import Vector3 = BABYLON.Vector3;
 
 const gltfLoaderCoordinateSystemMode = GLTFLoaderCoordinateSystemMode;
+
+const get_3d_position = (origin: Vector3, direction: Vector3, distance: number, meshId: string): Vector3 => {
+    const result: IntersectResult = new IntersectResult();
+    ray_intersect(meshId, origin.x, origin.y, origin.z, direction.x, direction.y, direction.z, result);
+    const intersect_position = origin.clone().add(direction.scale(result.distance));
+    result.free();
+    return intersect_position;
+}
 
 describe('Test ray intersect.', () => {
     it('Test Babylon Headless.', (done) => {
@@ -27,38 +36,47 @@ describe('Test ray intersect.', () => {
             for (let index = 0; index < meshes.length; index++) {
                 const indices = meshes[index].getIndices();
                 if (!indices) {
-                  throw new Error("No indices in mesh.");
+                    continue;
                 }
                 const position = (meshes[index] as Mesh).getVerticesData(VertexBuffer.PositionKind);
                 if (!position) {
                     continue
-                  //throw new Error("No positions in mesh.");
                 }
 
+                const Origin = new BABYLON.Vector3(0, 0, 0);
+                const Direction = new BABYLON.Vector3(0, -1, 0);
+                const MaxDistance = Infinity;
+
+                //time test rusty
                 const meshId = 'test2-mesh';
                 set_mesh(meshId, new Uint32Array(indices), position as Float32Array);
-                const result: IntersectResult = new IntersectResult();
-                //
+
+                let position_intersect: Vector3 =get_3d_position(Origin, Direction, MaxDistance, meshId);
                 const t0 = Date.now()
-                for (let i = 0; i<1000;i++){
-                    ray_intersect(meshId, 0, 1, 0, 0, -1, 0, result);
+                for (let i = 0; i < 1000; i++) {
+                    position_intersect = get_3d_position(Origin, Direction, MaxDistance, meshId);
                 }
                 const t1 = Date.now()
+                console.log(`Rusty intersect took ${t1 - t0} milliseconds. Intersected at ${position_intersect.x}
+                ,${position_intersect.y},${position_intersect.z}`)
 
-                console.log("Rusty intersect took " + (t1 - t0) + " milliseconds.")
-                result.free();
+                //
                 expect(remove_mesh(meshId)).eq(true);
                 expect(has_mesh(meshId)).eq(false);
                 //
-                const t2 = Date.now()
-                for (let i = 0; i<1000;i++){
-                    const ray = new BABYLON.Ray(new BABYLON.Vector3(0,0,0), new BABYLON.Vector3(0,-1,0), Infinity);
-                    const hit = (meshes[index] as Mesh).intersects(ray, false);
+                (meshes[index] as Mesh).useOctreeForPicking = true;
+                (meshes[index] as Mesh).useOctreeForCollisions = true;
+                (meshes[index] as Mesh).useOctreeForRenderingSelection = true;
+                const ray = new BABYLON.Ray(Origin,Direction,MaxDistance);
+                const t2 = Date.now();
+
+                let hit = (meshes[index] as Mesh).intersects(ray, false);
+                for (let i = 0; i < 1000; i++) {
+                    const ray = new BABYLON.Ray(new BABYLON.Vector3(0, 0, 0), new BABYLON.Vector3(0, -1, 0), Infinity);
+                    hit = (meshes[index] as Mesh).intersects(ray, false);
                 }
                 const t3 = Date.now()
-                console.log("Babylon intersect took " + (t3 - t2) + " milliseconds.")
-
-
+                console.log(`Babylon intersect took ${t3 - t2} milliseconds. Intersected at ${hit.pickedPoint}`)
             }
 
             console.log("render started")
