@@ -6,3 +6,4 @@ cd ts/node && \
 npm install && \
 npm test && \
 cd ../..
+$SHELL
