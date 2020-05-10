@@ -3,7 +3,7 @@
   "collaborators": [
     "Tommi Laukkanen <tommi.laukkanen@codereality.io>"
   ],
-  "version": "0.0.21",
+  "version": "0.0.22",
   "browser": "bundler/intersect.js",
   "main": "node/intersect.js",
   "types": "intersect.d.ts"

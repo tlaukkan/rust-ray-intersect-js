@@ -103,6 +103,15 @@ pub fn ray_intersect(
             result.u = candidate.u;
             result.v = candidate.v;
             result.triangle_index = triangle.index;
+        } else {
+            let inverseCandidate = ray.intersects_triangle(&triangle.c, &triangle.b, &triangle.a);
+            if inverseCandidate.distance < result.distance {
+                result.hit = true;
+                result.distance = inverseCandidate.distance;
+                result.u = inverseCandidate.u;
+                result.v = inverseCandidate.v;
+                result.triangle_index = triangle.index;
+            }
         }
     }
 
@@ -157,19 +166,19 @@ impl Mesh {
             let triangle = Triangle::new(
                 index,
                 Point3::new(
-                    positions[indices[i + 0] as usize * 3 + 2],
-                    positions[indices[i + 0] as usize * 3 + 1],
                     positions[indices[i + 0] as usize * 3 + 0],
+                    positions[indices[i + 0] as usize * 3 + 1],
+                    positions[indices[i + 0] as usize * 3 + 2],
                 ),
                 Point3::new(
-                    positions[indices[i + 1] as usize * 3 + 2],
-                    positions[indices[i + 1] as usize * 3 + 1],
                     positions[indices[i + 1] as usize * 3 + 0],
+                    positions[indices[i + 1] as usize * 3 + 1],
+                    positions[indices[i + 1] as usize * 3 + 2],
                 ),
                 Point3::new(
-                    positions[indices[i + 2] as usize * 3 + 2],
-                    positions[indices[i + 2] as usize * 3 + 1],
                     positions[indices[i + 2] as usize * 3 + 0],
+                    positions[indices[i + 2] as usize * 3 + 1],
+                    positions[indices[i + 2] as usize * 3 + 2],
                 ),
             );
 
