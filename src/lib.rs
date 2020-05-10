@@ -31,7 +31,7 @@ pub fn set_mesh(mesh_id: &str, indices: js_sys::Uint32Array, positions: js_sys::
     _set_mesh(mesh_id, indices.to_vec(), positions.to_vec())
 }
 
-fn _set_mesh(mesh_id: &str, indices: Vec<u32>, positions: Vec<f32>) {
+pub fn _set_mesh(mesh_id: &str, indices: Vec<u32>, positions: Vec<f32>) {
     let mut map = HASHMAP.lock().unwrap();
     let key = mesh_id.to_string();
     if map.contains_key(&key) {
@@ -139,6 +139,10 @@ impl Mesh {
         let mut triangles: Vec<Triangle> = Vec::new();
         let mut index: u32 = 0;
 
+        if indices.len() == 0 {
+            panic!("No triangles.");
+        }
+
         for i in (0..indices.len()).step_by(3) {
             let triangle = Triangle::new(
                 index,
@@ -172,9 +176,33 @@ impl Mesh {
                 triangle.c[2],
             );*/
 
+            // Ignore triangles with zero area
+            if triangle.a[0] == triangle.b[0]
+                && triangle.a[1] == triangle.b[1]
+                && triangle.a[2] == triangle.b[2]
+            {
+                continue;
+            }
+            if triangle.b[0] == triangle.c[0]
+                && triangle.b[1] == triangle.c[1]
+                && triangle.b[2] == triangle.c[2]
+            {
+                continue;
+            }
+            if triangle.c[0] == triangle.a[0]
+                && triangle.c[1] == triangle.a[1]
+                && triangle.c[2] == triangle.a[2]
+            {
+                continue;
+            }
+
             triangles.push(triangle);
 
             index = index + 1;
+        }
+
+        if index == 0 {
+            panic!("All triangles have zero surface area.");
         }
 
         let bvh: BVH = BVH::build(&mut triangles);

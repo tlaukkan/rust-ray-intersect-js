@@ -2,43 +2,43 @@
 
 Sandbox project for ray intersect implementation with Rust for JavaScript.
 
-### Build with `wasm-pack build`
+## Build and Test
+
+When interface does not change run the following. If interface changes then pkg/intersect.d.ts and pkg/web/intersect.js need
+to be changed by hand.
 
 ```
-
-wasm-pack build --scope tlaukkan --target nodejs
+./build.sh
+./test.sh
 ```
 
-### Test in Headless Browsers with `wasm-pack test`
-
-```
-wasm-pack test --headless --firefox
-```
+## Publish
 
 ### Initial scoped public publish to NPM
 
 ```
+cd pkg
 npm publish --access=public
 ```
 
-### Build and Publish to NPM
+### Publish
 
 ```
-wasm-pack build --release --scope tlaukkan --target nodejs --out-dir pkg/node && cp pkg/node/intersect.d.ts pkg/intersect.d.ts
-wasm-pack build --release --scope tlaukkan --target bundler --out-dir pkg2/bundler
-wasm-pack build --release --scope tlaukkan --target web --out-dir pkg2/web
+cd pkg
+npm publish
 ```
-
 
 ### Deprecate from NPM
 
 ```
+cd pkg
 npm deprecate @tlaukkan/intersect@"< 0.2.3" "critical bug fixed in v0.2.3"
 ```
 
 ### Unpublish a version from NPM
 
 ```
+cd pkg
 npm unpublish @tlaukkan/intersect@0.1.0
 ```
 
