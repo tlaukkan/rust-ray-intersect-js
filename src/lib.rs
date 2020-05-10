@@ -6,8 +6,9 @@ use bvh::bounding_hierarchy::BHShape;
 use bvh::bvh::BVH;
 use bvh::ray::Ray;
 use js_sys;
-use nalgebra::{Point3, Vector3};
+use nalgebra::{magnitude, Point3, Vector, Vector3};
 use std::collections::HashMap;
+use std::panic;
 use std::sync::Mutex;
 use wasm_bindgen::prelude::*;
 
@@ -32,15 +33,24 @@ pub fn set_mesh(mesh_id: &str, indices: js_sys::Uint32Array, positions: js_sys::
 }
 
 pub fn _set_mesh(mesh_id: &str, indices: Vec<u32>, positions: Vec<f32>) {
-    let mut map = HASHMAP.lock().unwrap();
-    let key = mesh_id.to_string();
-    if map.contains_key(&key) {
-        map.remove(&key);
+    let result = panic::catch_unwind(|| {
+        return Mesh::new(mesh_id.to_string(), indices, positions);
+    })
+    .ok();
+
+    match result {
+        Some(value) => {
+            let mut map = HASHMAP.lock().unwrap();
+            let key = mesh_id.to_string();
+            if map.contains_key(&key) {
+                map.remove(&key);
+            }
+            map.insert(mesh_id.to_string(), value);
+        }
+        None => {
+            panic!("Error in mesh triangles. Most likely no valid triangles.");
+        }
     }
-    map.insert(
-        mesh_id.to_string(),
-        Mesh::new(mesh_id.to_string(), indices, positions),
-    );
 }
 
 #[wasm_bindgen]
@@ -162,37 +172,32 @@ impl Mesh {
                     positions[indices[i + 2] as usize * 3 + 0],
                 ),
             );
-            /*println!(
-                "triangle #{} ({},{},{}) ({},{},{}) ({},{},{}) ",
-                triangle.index,
-                triangle.a[0],
-                triangle.a[1],
-                triangle.a[2],
-                triangle.b[0],
-                triangle.b[1],
-                triangle.b[2],
-                triangle.c[0],
-                triangle.c[1],
-                triangle.c[2],
-            );*/
 
-            // Ignore triangles with zero area
-            if triangle.a[0] == triangle.b[0]
-                && triangle.a[1] == triangle.b[1]
-                && triangle.a[2] == triangle.b[2]
-            {
+            // Check for vectors with zero surface area.
+            let ab = Vector3::new(
+                triangle.b[0] - triangle.a[0],
+                triangle.b[1] - triangle.a[1],
+                triangle.b[2] - triangle.a[2],
+            );
+            let ac = Vector3::new(
+                triangle.c[0] - triangle.a[0],
+                triangle.c[1] - triangle.a[1],
+                triangle.c[2] - triangle.a[2],
+            );
+            if ab.magnitude() == 0.0 {
+                Mesh::log_ignored_triangle(&triangle);
                 continue;
             }
-            if triangle.b[0] == triangle.c[0]
-                && triangle.b[1] == triangle.c[1]
-                && triangle.b[2] == triangle.c[2]
-            {
+            if ac.magnitude() == 0.0 {
+                Mesh::log_ignored_triangle(&triangle);
                 continue;
             }
-            if triangle.c[0] == triangle.a[0]
-                && triangle.c[1] == triangle.a[1]
-                && triangle.c[2] == triangle.a[2]
-            {
+            let abn = ab.normalize();
+            let acn = ac.normalize();
+            let dot = abn.dot(&acn);
+
+            if dot == 1.0 || dot == -1.0 {
+                Mesh::log_ignored_triangle(&triangle);
                 continue;
             }
 
@@ -212,6 +217,21 @@ impl Mesh {
             bvh,
             triangles,
         }
+    }
+
+    fn log_ignored_triangle(triangle: &Triangle) {
+        println!(
+            "Ignored triangle with zero surface area: ({},{},{}) ({},{},{}) ({},{},{}) ",
+            triangle.a[0],
+            triangle.a[1],
+            triangle.a[2],
+            triangle.b[0],
+            triangle.b[1],
+            triangle.b[2],
+            triangle.c[0],
+            triangle.c[1],
+            triangle.c[2],
+        );
     }
 }
 
