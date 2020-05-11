@@ -3,13 +3,8 @@
   "collaborators": [
     "Tommi Laukkanen <tommi.laukkanen@codereality.io>"
   ],
-  "version": "0.0.6",
-  "files": [
-    "intersect_bg.wasm",
-    "intersect.js",
-    "intersect_bg.js",
-    "intersect.d.ts"
-  ],
-  "main": "intersect.js",
+  "version": "0.0.22",
+  "browser": "bundler/intersect.js",
+  "main": "node/intersect.js",
   "types": "intersect.d.ts"
 }

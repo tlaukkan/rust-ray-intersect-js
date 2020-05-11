@@ -8,8 +8,10 @@ use bvh::aabb::{Bounded, AABB};
 use bvh::bounding_hierarchy::BHShape;
 use bvh::bvh::BVH;
 use bvh::ray::Ray;
-use nalgebra::{Point3, Vector3};
+use js_sys;
+use nalgebra::{magnitude, Point3, Vector, Vector3};
 use std::collections::HashMap;
+use std::panic;
 use std::sync::Mutex;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -32,16 +34,25 @@ pub fn set_mesh(mesh_id: &str, indices: js_sys::Uint32Array, positions: js_sys::
     _set_mesh(mesh_id, indices.to_vec(), positions.to_vec())
 }
 
-fn _set_mesh(mesh_id: &str, indices: Vec<u32>, positions: Vec<f32>) {
-    let mut map = HASHMAP.lock().unwrap();
-    let key = mesh_id.to_string();
-    if map.contains_key(&key) {
-        map.remove(&key);
+pub fn _set_mesh(mesh_id: &str, indices: Vec<u32>, positions: Vec<f32>) {
+    let result = panic::catch_unwind(|| {
+        return Mesh::new(mesh_id.to_string(), indices, positions);
+    })
+    .ok();
+
+    match result {
+        Some(value) => {
+            let mut map = HASHMAP.lock().unwrap();
+            let key = mesh_id.to_string();
+            if map.contains_key(&key) {
+                map.remove(&key);
+            }
+            map.insert(mesh_id.to_string(), value);
+        }
+        None => {
+            panic!("Error in mesh triangles. Most likely no valid triangles.");
+        }
     }
-    map.insert(
-        mesh_id.to_string(),
-        Mesh::new(mesh_id.to_string(), indices, positions),
-    );
 }
 
 #[wasm_bindgen]
@@ -101,7 +112,40 @@ pub fn ray_intersect(
         intercepts = _ray_intersect(ray, mesh, intercepts);
     }
 
-    intercepts.into_iter().map(JsValue::from).collect()
+    let mesh: &Mesh = map.get(&key).unwrap();
+
+    let origin = Point3::new(origin_x, origin_y, origin_z);
+    let direction = Vector3::new(direction_x, direction_y, direction_z);
+    let ray = Ray::new(origin, direction);
+
+    let hits = &mesh.bvh.traverse(&ray, &mesh.triangles);
+
+    result.distance = f32::INFINITY;
+    for triangle in hits {
+        let candidate = ray.intersects_triangle(&triangle.a, &triangle.b, &triangle.c);
+        /*println!(
+            "candidate triangle {} at {}",
+            triangle.index, candidate.distance
+        );*/
+        if candidate.distance < result.distance {
+            result.hit = true;
+            result.distance = candidate.distance;
+            result.u = candidate.u;
+            result.v = candidate.v;
+            result.triangle_index = triangle.index;
+        } else {
+            let inverseCandidate = ray.intersects_triangle(&triangle.c, &triangle.b, &triangle.a);
+            if inverseCandidate.distance < result.distance {
+                result.hit = true;
+                result.distance = inverseCandidate.distance;
+                result.u = inverseCandidate.u;
+                result.v = inverseCandidate.v;
+                result.triangle_index = triangle.index;
+            }
+        }
+    }
+
+    return result.hit;
 }
 
 #[wasm_bindgen]
@@ -139,26 +183,63 @@ impl Mesh {
     pub fn new(mesh_id: String, indices: Vec<u32>, positions: Vec<f32>) -> Mesh {
         let mut triangles: Vec<Triangle> = Vec::new();
 
-        for (tri_index, i) in (0..indices.len()).step_by(3).enumerate() {
+        if indices.len() == 0 {
+            panic!("No triangles.");
+        }
+
+        for i in (0..indices.len()).step_by(3) {
             let triangle = Triangle::new(
                 tri_index as u32,
                 Point3::new(
-                    positions[indices[i] as usize * 3 + 2],
-                    positions[indices[i] as usize * 3 + 1],
-                    positions[indices[i] as usize * 3],
+                    positions[indices[i + 0] as usize * 3 + 0],
+                    positions[indices[i + 0] as usize * 3 + 1],
+                    positions[indices[i + 0] as usize * 3 + 2],
                 ),
                 Point3::new(
-                    positions[indices[i + 1] as usize * 3 + 2],
+                    positions[indices[i + 1] as usize * 3 + 0],
                     positions[indices[i + 1] as usize * 3 + 1],
-                    positions[indices[i + 1] as usize * 3],
+                    positions[indices[i + 1] as usize * 3 + 2],
                 ),
                 Point3::new(
-                    positions[indices[i + 2] as usize * 3 + 2],
+                    positions[indices[i + 2] as usize * 3 + 0],
                     positions[indices[i + 2] as usize * 3 + 1],
-                    positions[indices[i + 2] as usize * 3],
+                    positions[indices[i + 2] as usize * 3 + 2],
                 ),
             );
+
+            // Check for vectors with zero surface area.
+            let ab = Vector3::new(
+                triangle.b[0] - triangle.a[0],
+                triangle.b[1] - triangle.a[1],
+                triangle.b[2] - triangle.a[2],
+            );
+            let ac = Vector3::new(
+                triangle.c[0] - triangle.a[0],
+                triangle.c[1] - triangle.a[1],
+                triangle.c[2] - triangle.a[2],
+            );
+            if ab.magnitude() == 0.0 {
+                Mesh::log_ignored_triangle(&triangle);
+                continue;
+            }
+            if ac.magnitude() == 0.0 {
+                Mesh::log_ignored_triangle(&triangle);
+                continue;
+            }
+            let abn = ab.normalize();
+            let acn = ac.normalize();
+            let dot = abn.dot(&acn);
+
+            if dot == 1.0 || dot == -1.0 {
+                Mesh::log_ignored_triangle(&triangle);
+                continue;
+            }
+
             triangles.push(triangle);
+        }
+
+        if index == 0 {
+            panic!("All triangles have zero surface area.");
         }
 
         let bvh: BVH = BVH::build(&mut triangles);
@@ -168,6 +249,21 @@ impl Mesh {
             bvh,
             triangles,
         }
+    }
+
+    fn log_ignored_triangle(triangle: &Triangle) {
+        println!(
+            "Ignored triangle with zero surface area: ({},{},{}) ({},{},{}) ({},{},{}) ",
+            triangle.a[0],
+            triangle.a[1],
+            triangle.a[2],
+            triangle.b[0],
+            triangle.b[1],
+            triangle.b[2],
+            triangle.c[0],
+            triangle.c[1],
+            triangle.c[2],
+        );
     }
 }
 
