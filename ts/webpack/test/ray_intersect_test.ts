@@ -66,11 +66,12 @@ describe('Test ray intersect.', () => {
 
       expect(has_mesh(meshId)).eq(true);
 
-      const result: IntersectResult = new IntersectResult();
-      expect(ray_intersect(meshId, 0, 1, 0, 0, -1, 0, result)).eq(true);
-      expect(result.hit).eq(true);
-      expect(result.distance).eq(0.5);
-      result.free();
+      const result: IntersectResult[] = ray_intersect(meshId, 0, 1, 0, 0, -1, 0);
+      expect(result.length).eq(4);
+      expect(result[0].hit).eq(true);
+      expect(result[0].distance).eq(0.5);
+      result[0].free();
+      result[1].free();
 
       expect(remove_mesh(meshId)).eq(true);
       expect(has_mesh(meshId)).eq(false);

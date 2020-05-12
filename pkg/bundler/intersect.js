@@ -136,6 +136,10 @@ imports.wbg = {};
 imports.wbg.__wbindgen_object_drop_ref = function(arg0) {
     takeObject(arg0);
 };
+imports.wbg.__wbg_intersectresult_new = function(arg0) {
+    var ret = IntersectResult.__wrap(arg0);
+    return addHeapObject(ret);
+};
 imports.wbg.__wbg_new_59cb74e423758ede = function() {
     var ret = new Error();
     return addHeapObject(ret);
@@ -153,6 +157,14 @@ imports.wbg.__wbg_error_4bb6c2a97407129a = function(arg0, arg1) {
     } finally {
         wasm.__wbindgen_free(arg0, arg1);
     }
+};
+imports.wbg.__wbg_new_0d50725e1ae68303 = function() {
+    var ret = new Array();
+    return addHeapObject(ret);
+};
+imports.wbg.__wbg_push_46274b393147c746 = function(arg0, arg1) {
+    var ret = getObject(arg0).push(getObject(arg1));
+    return ret;
 };
 imports.wbg.__wbg_buffer_eb5185aa4a8e9c62 = function(arg0) {
     var ret = getObject(arg0).buffer;
@@ -231,15 +243,13 @@ export function remove_mesh(mesh_id) {
  * @param {number} direction_x
  * @param {number} direction_y
  * @param {number} direction_z
- * @param {IntersectResult} result
- * @returns {boolean}
+ * @returns {Array<IntersectResult>}
  */
-export function ray_intersect(mesh_id, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, result) {
+export function ray_intersect(mesh_id, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z) {
     var ptr0 = passStringToWasm0(mesh_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     var len0 = WASM_VECTOR_LEN;
-    _assertClass(result, IntersectResult);
-    var ret = wasm.ray_intersect(ptr0, len0, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, result.ptr);
-    return ret !== 0;
+    var ret = wasm.ray_intersect(ptr0, len0, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z);
+    return takeObject(ret);
 }
 
 /**

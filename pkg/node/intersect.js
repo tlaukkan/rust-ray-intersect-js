@@ -99,12 +99,6 @@ module.exports.remove_mesh = function(mesh_id) {
     return ret !== 0;
 };
 
-function _assertClass(instance, klass) {
-    if (!(instance instanceof klass)) {
-        throw new Error(`expected instance of ${klass.name}`);
-    }
-    return instance.ptr;
-}
 /**
 * @param {string} mesh_id
 * @param {number} origin_x
@@ -113,15 +107,13 @@ function _assertClass(instance, klass) {
 * @param {number} direction_x
 * @param {number} direction_y
 * @param {number} direction_z
-* @param {IntersectResult} result
-* @returns {boolean}
+* @returns {Array<IntersectResult>}
 */
-module.exports.ray_intersect = function(mesh_id, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, result) {
+module.exports.ray_intersect = function(mesh_id, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z) {
     var ptr0 = passStringToWasm0(mesh_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     var len0 = WASM_VECTOR_LEN;
-    _assertClass(result, IntersectResult);
-    var ret = wasm.ray_intersect(ptr0, len0, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, result.ptr);
-    return ret !== 0;
+    var ret = wasm.ray_intersect(ptr0, len0, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z);
+    return takeObject(ret);
 };
 
 /**
@@ -232,6 +224,11 @@ module.exports.__wbindgen_object_drop_ref = function(arg0) {
     takeObject(arg0);
 };
 
+module.exports.__wbg_intersectresult_new = function(arg0) {
+    var ret = IntersectResult.__wrap(arg0);
+    return addHeapObject(ret);
+};
+
 module.exports.__wbg_new_59cb74e423758ede = function() {
     var ret = new Error();
     return addHeapObject(ret);
@@ -251,6 +248,16 @@ module.exports.__wbg_error_4bb6c2a97407129a = function(arg0, arg1) {
     } finally {
         wasm.__wbindgen_free(arg0, arg1);
     }
+};
+
+module.exports.__wbg_new_0d50725e1ae68303 = function() {
+    var ret = new Array();
+    return addHeapObject(ret);
+};
+
+module.exports.__wbg_push_46274b393147c746 = function(arg0, arg1) {
+    var ret = getObject(arg0).push(getObject(arg1));
+    return ret;
 };
 
 module.exports.__wbg_buffer_eb5185aa4a8e9c62 = function(arg0) {

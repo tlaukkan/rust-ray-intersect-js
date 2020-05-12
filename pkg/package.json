@@ -10,6 +10,8 @@
     "intersect_bg.js",
     "intersect.d.ts"
   ],
-  "main": "intersect.js",
+  "version": "0.0.23",
+  "browser": "bundler/intersect.js",
+  "main": "node/intersect.js",
   "types": "intersect.d.ts"
 }
