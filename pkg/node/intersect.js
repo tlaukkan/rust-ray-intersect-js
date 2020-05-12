@@ -220,13 +220,13 @@ class IntersectResult {
 }
 module.exports.IntersectResult = IntersectResult;
 
-module.exports.__wbindgen_object_drop_ref = function(arg0) {
-    takeObject(arg0);
-};
-
 module.exports.__wbg_intersectresult_new = function(arg0) {
     var ret = IntersectResult.__wrap(arg0);
     return addHeapObject(ret);
+};
+
+module.exports.__wbindgen_object_drop_ref = function(arg0) {
+    takeObject(arg0);
 };
 
 module.exports.__wbg_new_59cb74e423758ede = function() {

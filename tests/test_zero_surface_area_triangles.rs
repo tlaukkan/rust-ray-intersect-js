@@ -1,6 +1,7 @@
 use bvh::ray::Ray;
 use intersect;
-use intersect::{_ray_intersect, _set_mesh, has_mesh, remove_mesh, IntersectResult, Triangle};
+use intersect::model::Triangle;
+use intersect::{_ray_intersect, _set_mesh, has_mesh, remove_mesh, IntersectResult};
 use nalgebra::{Point3, Vector3};
 
 #[test]
