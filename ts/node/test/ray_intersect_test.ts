@@ -6,7 +6,7 @@ import {
     MeshIntersector,
     ray_intersect,
     remove_mesh,
-    set_mesh
+    set_mesh, SphereIntersector
 } from 'rust-ray-intersect';
 
 import * as BABYLON from 'babylonjs';
@@ -107,7 +107,7 @@ describe('Test ray intersect.', () => {
 
     }).timeout(20000);
 
-    it('Should test ray intersect.', async () => {
+    it('Should test ray mesh intersect.', async () => {
         init_panic_hook();
 
         const indices = new Uint32Array([
@@ -175,4 +175,25 @@ describe('Test ray intersect.', () => {
 
     }).timeout(10000);
 
+    it('Should test ray sphere intersect.', async () => {
+        init_panic_hook();
+
+        const id = 'test-mesh';
+
+        const intersector = new SphereIntersector();
+
+        expect(intersector.has(id)).eq(false);
+
+        expect(intersector.set(id, 0, 0, 0, 1));
+
+        expect(intersector.has(id)).eq(true);
+
+        const result: String[] = intersector.intersect( 0, 1, 0, 0, -1, 0, 1);
+        expect(result.length).eq(1);
+        expect(result[0]).eq(id);
+
+        expect(intersector.remove(id)).eq(true);
+        expect(intersector.has(id)).eq(false);
+
+    }).timeout(10000);
 });

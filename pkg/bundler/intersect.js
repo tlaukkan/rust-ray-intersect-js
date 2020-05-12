@@ -462,10 +462,10 @@ export class MeshIntersector {
 }
 /**
  */
-export class SphereInterceptor {
+export class SphereIntersector {
 
     static __wrap(ptr) {
-        const obj = Object.create(SphereInterceptor.prototype);
+        const obj = Object.create(SphereIntersector.prototype);
         obj.ptr = ptr;
 
         return obj;
@@ -475,22 +475,22 @@ export class SphereInterceptor {
         const ptr = this.ptr;
         this.ptr = 0;
 
-        wasm.__wbg_sphereinterceptor_free(ptr);
+        wasm.__wbg_sphereintersector_free(ptr);
     }
     /**
      */
     constructor() {
-        var ret = wasm.sphereinterceptor_new();
-        return SphereInterceptor.__wrap(ret);
+        var ret = wasm.sphereintersector_new();
+        return SphereIntersector.__wrap(ret);
     }
     /**
      * @param {string} id
      * @returns {boolean}
      */
-    contains(id) {
+    has(id) {
         var ptr0 = passStringToWasm0(id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        var ret = wasm.sphereinterceptor_contains(this.ptr, ptr0, len0);
+        var ret = wasm.sphereintersector_has(this.ptr, ptr0, len0);
         return ret !== 0;
     }
     /**
@@ -500,7 +500,7 @@ export class SphereInterceptor {
     remove(id) {
         var ptr0 = passStringToWasm0(id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        var ret = wasm.sphereinterceptor_remove(this.ptr, ptr0, len0);
+        var ret = wasm.sphereintersector_remove(this.ptr, ptr0, len0);
         return ret !== 0;
     }
     /**
@@ -513,7 +513,7 @@ export class SphereInterceptor {
     set(id, x, y, z, radius) {
         var ptr0 = passStringToWasm0(id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.sphereinterceptor_set(this.ptr, ptr0, len0, x, y, z, radius);
+        wasm.sphereintersector_set(this.ptr, ptr0, len0, x, y, z, radius);
     }
     /**
      * @param {number} origin_x
@@ -526,7 +526,7 @@ export class SphereInterceptor {
      * @returns {Array<String>}
      */
     intersect(origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, ray_length) {
-        var ret = wasm.sphereinterceptor_intersect(this.ptr, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, ray_length);
+        var ret = wasm.sphereintersector_intersect(this.ptr, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, ray_length);
         return takeObject(ret);
     }
 }

@@ -97,7 +97,7 @@ export class MeshIntersector {
 }
 /**
  */
-export class SphereInterceptor {
+export class SphereIntersector {
   free(): void;
   /**
    */
@@ -106,7 +106,7 @@ export class SphereInterceptor {
    * @param {string} id
    * @returns {boolean}
    */
-  contains(id: string): boolean;
+  has(id: string): boolean;
   /**
    * @param {string} id
    * @returns {boolean}

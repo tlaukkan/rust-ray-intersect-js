@@ -11,18 +11,18 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 
 #[wasm_bindgen]
-pub struct SphereInterceptor {
+pub struct SphereIntersector {
     spheres: Vec<Sphere>,
     sphereMap: HashMap<String, Sphere>,
     bvh: Option<BVH>,
 }
 
 #[wasm_bindgen]
-impl SphereInterceptor {
+impl SphereIntersector {
     #[wasm_bindgen(constructor)]
-    pub fn new() -> SphereInterceptor {
+    pub fn new() -> SphereIntersector {
         let mut spheres: Vec<Sphere> = Vec::new();
-        SphereInterceptor {
+        SphereIntersector {
             bvh: None,
             spheres,
             sphereMap: HashMap::new(),
@@ -30,7 +30,7 @@ impl SphereInterceptor {
     }
 
     #[wasm_bindgen]
-    pub fn contains(&mut self, id: &str) -> bool {
+    pub fn has(&mut self, id: &str) -> bool {
         let mesh_id_string = id.to_string();
         return self.sphereMap.contains_key(&mesh_id_string);
     }
@@ -147,7 +147,7 @@ mod tests {
 
     #[test]
     fn test_ray_intersect() {
-        let mut intersector = SphereInterceptor::new();
+        let mut intersector = SphereIntersector::new();
 
         let mesh_id = "1";
         let indices: Vec<u32> = vec![
@@ -162,9 +162,9 @@ mod tests {
             0.5, -0.5, -0.5, -0.5, -0.5, -0.5, -0.5, -0.5, 0.5,
         ];
 
-        assert_eq!(intersector.contains(mesh_id), false);
+        assert_eq!(intersector.has(mesh_id), false);
         intersector.set(mesh_id, 0.0, 0.0, 0.0, 0.5);
-        assert_eq!(intersector.contains(mesh_id), true);
+        assert_eq!(intersector.has(mesh_id), true);
 
         let mut intercepting_mesh_ids: Vec<String> = intersector.internal_intersect(
             &Ray::new(Point3::new(0.0, 1.0, 0.0), Vector3::new(0.0, -1.0, 0.0)),
@@ -195,6 +195,6 @@ mod tests {
         );
 
         assert_eq!(intersector.remove(&mesh_id), true);
-        assert_eq!(intersector.contains(&mesh_id), false);
+        assert_eq!(intersector.has(&mesh_id), false);
     }
 }
