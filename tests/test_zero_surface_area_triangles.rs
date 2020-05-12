@@ -1,5 +1,6 @@
+use bvh::ray::Ray;
 use intersect;
-use intersect::{_set_mesh, has_mesh, ray_intersect, remove_mesh, IntersectResult, Triangle};
+use intersect::{_ray_intersect, _set_mesh, has_mesh, remove_mesh, IntersectResult, Triangle};
 use nalgebra::{Point3, Vector3};
 
 #[test]
@@ -10,7 +11,7 @@ fn test_ray_intersect_with_zero_surface_area_triangles_only() {
     let positions: Vec<f32> = vec![0.0, 0.0, 0.0, 1.0, 0.0, 0.0];
 
     for i in (0..indices.len()).step_by(3) {
-        let triangle = Triangle::new(
+        let _triangle = Triangle::new(
             0,
             Point3::new(
                 positions[indices[i + 0] as usize * 3 + 2],
@@ -28,19 +29,6 @@ fn test_ray_intersect_with_zero_surface_area_triangles_only() {
                 positions[indices[i + 2] as usize * 3 + 0],
             ),
         );
-        /*println!(
-            "triangle #{} ({},{},{}) ({},{},{}) ({},{},{}) ",
-            triangle.index,
-            triangle.a[0],
-            triangle.a[1],
-            triangle.a[2],
-            triangle.b[0],
-            triangle.b[1],
-            triangle.b[2],
-            triangle.c[0],
-            triangle.c[1],
-            triangle.c[2],
-        );*/
     }
 
     assert_eq!(has_mesh(mesh_id), false);
@@ -49,18 +37,15 @@ fn test_ray_intersect_with_zero_surface_area_triangles_only() {
 
     assert_eq!(has_mesh(mesh_id), true);
 
-    let mut result = IntersectResult {
-        hit: false,
-        triangle_index: 0,
-        u: 0.0,
-        v: 0.0,
-        distance: 0.0,
-    };
+    let origin = Point3::new(0.0, 1.0, 0.0);
+    let direction = Vector3::new(0.0, -1.0, 0.0);
+    let ray = Ray::new(origin, direction);
 
-    assert_eq!(
-        ray_intersect(mesh_id, 0.0, 1.0, 0.0, 0.0, -1.0, 0.0, &mut result),
-        true
-    );
+    let intercepts: Vec<IntersectResult> = vec![];
+    let intercepts = _ray_intersect(ray, mesh_id, intercepts);
+
+    assert_eq!(intercepts.len() > 0, true);
+    let result = &intercepts[0];
 
     assert_eq!(result.hit, true);
     assert_eq!(result.distance, 0.5);
@@ -91,18 +76,16 @@ fn test_ray_intersect_with_zero_surface_area_triangles() {
 
     assert_eq!(has_mesh(mesh_id), true);
 
-    let mut result = IntersectResult {
-        hit: false,
-        triangle_index: 0,
-        u: 0.0,
-        v: 0.0,
-        distance: 0.0,
-    };
+    let result;
 
-    assert_eq!(
-        ray_intersect(mesh_id, 0.0, 1.0, 0.0, 0.0, -1.0, 0.0, &mut result),
-        true
-    );
+    let origin = Point3::new(0.0, 1.0, 0.0);
+    let direction = Vector3::new(0.0, -1.0, 0.0);
+    let ray = Ray::new(origin, direction);
+
+    let mut intercepts: Vec<IntersectResult> = vec![];
+    intercepts = _ray_intersect(ray, mesh_id, intercepts);
+    assert_eq!(intercepts.len(), 4);
+    result = &intercepts[0];
 
     assert_eq!(result.hit, true);
     assert_eq!(result.distance, 0.5);
@@ -161,24 +144,20 @@ fn test_ray_intersect_with_zero_surface_area_triangles_only_2() {
 
     assert_eq!(has_mesh(mesh_id), true);
 
-    let mut result = IntersectResult {
-        hit: false,
-        triangle_index: 0,
-        u: 0.0,
-        v: 0.0,
-        distance: 0.0,
-    };
+    let result;
 
-    assert_eq!(
-        ray_intersect(mesh_id, 0.0, 1.0, 0.0, 0.0, -1.0, 0.0, &mut result),
-        true
-    );
+    let origin = Point3::new(0.0, 1.0, 0.0);
+    let direction = Vector3::new(0.0, -1.0, 0.0);
+    let ray = Ray::new(origin, direction);
+
+    let mut intercepts: Vec<IntersectResult> = vec![];
+    intercepts = _ray_intersect(ray, mesh_id, intercepts);
+    assert_eq!(intercepts.len() > 0, true);
+    result = &intercepts[0];
 
     assert_eq!(result.hit, true);
     assert_eq!(result.distance, 0.5);
-
     assert_eq!(remove_mesh(mesh_id), true);
-
     assert_eq!(has_mesh(mesh_id), false);
 }
 
@@ -8916,16 +8895,12 @@ fn test_ray_intersect_with_zero_surface_area_triangles_2() {
 
     assert_eq!(has_mesh(mesh_id), true);
 
-    let mut result = IntersectResult {
-        hit: false,
-        triangle_index: 0,
-        u: 0.0,
-        v: 0.0,
-        distance: 0.0,
-    };
+    let origin = Point3::new(0.0, 1.0, 0.0);
+    let direction = Vector3::new(0.0, -1.0, 0.0);
+    let ray = Ray::new(origin, direction);
 
-    assert_eq!(
-        ray_intersect(mesh_id, 0.0, 1.0, 0.0, 0.0, -1.0, 0.0, &mut result),
-        false
-    );
+    let intercepts: Vec<IntersectResult> = vec![];
+    let intercepts = _ray_intersect(ray, mesh_id, intercepts);
+
+    assert_eq!(intercepts.len() == 0, true);
 }

@@ -1,9 +1,5 @@
 //! Test suite for the Web and headless browsers.
 #![cfg(target_arch = "wasm32")]
-
-#[path = "../src/math/calc.rs"]
-use intersect;
-
 extern crate wasm_bindgen_test;
 use wasm_bindgen_test::*;
 

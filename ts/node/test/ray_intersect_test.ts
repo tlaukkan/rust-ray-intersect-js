@@ -18,9 +18,9 @@ const get_3d_position = (origin: Vector3, direction: Vector3, distance: number, 
     }
     let Intercepts = [];
     for (const intersect_result of result){
-        const intersect_position = origin.clone().add(direction.scale((intersect_result as IntersectResult).distance));
+        const intersect_position = origin.clone().add(direction.scale(intersect_result.distance));
         Intercepts.push(intersect_position);
-        (intersect_result as IntersectResult).free();
+        intersect_result.free();
     }
     return Intercepts;
 
