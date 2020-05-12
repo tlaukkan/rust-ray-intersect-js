@@ -5,20 +5,13 @@ use nalgebra::{Point, Point3, Vector3};
 
 pub struct Mesh {
     pub mesh_id: String,
-    pub sphere: Sphere,
     pub bvh: BVH,
+    pub radius: f32,
     pub triangles: Vec<Triangle>,
 }
 
 impl Mesh {
-    pub fn new(
-        mesh_id: String,
-        x: f32,
-        y: f32,
-        z: f32,
-        indices: Vec<u32>,
-        positions: Vec<f32>,
-    ) -> Mesh {
+    pub fn new(mesh_id: String, indices: Vec<u32>, positions: Vec<f32>) -> Mesh {
         let mut triangles: Vec<Triangle> = Vec::new();
         let mut index: u32 = 0;
 
@@ -92,17 +85,10 @@ impl Mesh {
         radius = f32::max(radius, get_point_magnitude(&labb.max));
         radius = f32::max(radius, get_point_magnitude(&rabb.min));
         radius = f32::max(radius, get_point_magnitude(&rabb.max));
-        let position = Point3::new(x, y, z);
-        let sphere: Sphere = Sphere {
-            id: mesh_id.clone(),
-            position: position,
-            radius: radius,
-            node_index: 0,
-        };
 
         Mesh {
             mesh_id,
-            sphere,
+            radius,
             bvh,
             triangles,
         }

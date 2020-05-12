@@ -1,8 +1,9 @@
 #[macro_use]
 extern crate lazy_static;
 
-mod mesh_bvh;
+mod mesh_intersector;
 pub mod model;
+mod sphere_intersector;
 use model::Mesh;
 
 use bvh::aabb::{Bounded, AABB};
@@ -38,9 +39,7 @@ pub fn set_mesh(mesh_id: &str, indices: js_sys::Uint32Array, positions: js_sys::
 }
 
 pub fn _set_mesh(mesh_id: &str, indices: Vec<u32>, positions: Vec<f32>) {
-    let result =
-        panic::catch_unwind(|| Mesh::new(mesh_id.to_string(), 0.0, 0.0, 0.0, indices, positions))
-            .ok();
+    let result = panic::catch_unwind(|| Mesh::new(mesh_id.to_string(), indices, positions)).ok();
 
     match result {
         Some(value) => {
