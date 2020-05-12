@@ -1,18 +1,25 @@
 use crate::model;
+use crate::StringArray;
 use bvh::aabb::Bounded;
 use bvh::bvh::BVH;
 use bvh::ray::Ray;
+use js_sys::Array;
 use model::Sphere;
 use nalgebra::{distance, Point3, Vector3};
 use std::collections::HashMap;
+use wasm_bindgen::prelude::*;
+use wasm_bindgen::JsCast;
 
-struct SphereInterceptor {
+#[wasm_bindgen]
+pub struct SphereInterceptor {
     spheres: Vec<Sphere>,
     sphereMap: HashMap<String, Sphere>,
     bvh: Option<BVH>,
 }
 
+#[wasm_bindgen]
 impl SphereInterceptor {
+    #[wasm_bindgen(constructor)]
     pub fn new() -> SphereInterceptor {
         let mut spheres: Vec<Sphere> = Vec::new();
         SphereInterceptor {
@@ -22,11 +29,13 @@ impl SphereInterceptor {
         }
     }
 
+    #[wasm_bindgen]
     pub fn contains(&mut self, id: &str) -> bool {
         let mesh_id_string = id.to_string();
         return self.sphereMap.contains_key(&mesh_id_string);
     }
 
+    #[wasm_bindgen]
     pub fn remove(&mut self, id: &str) -> bool {
         let key = id.to_string();
         if self.sphereMap.contains_key(&key) {
@@ -50,6 +59,7 @@ impl SphereInterceptor {
         }
     }
 
+    #[wasm_bindgen]
     pub fn set(&mut self, id: &str, x: f32, y: f32, z: f32, radius: f32) {
         let sphere: Sphere = Sphere {
             id: id.to_string(),
@@ -81,7 +91,29 @@ impl SphereInterceptor {
         self.sphereMap.insert(id.to_string(), sphere);
     }
 
-    pub fn intersect(&mut self, ray: &Ray, ray_length: f32) -> Vec<String> {
+    #[wasm_bindgen]
+    pub fn intersect(
+        &mut self,
+        origin_x: f32,
+        origin_y: f32,
+        origin_z: f32,
+        direction_x: f32,
+        direction_y: f32,
+        direction_z: f32,
+        ray_length: f32,
+    ) -> StringArray {
+        let origin = Point3::new(origin_x, origin_y, origin_z);
+        let direction = Vector3::new(direction_x, direction_y, direction_z);
+        let ray = Ray::new(origin, direction);
+        let intersecting_mesh_ids = self.internal_intersect(&ray, ray_length);
+        intersecting_mesh_ids
+            .into_iter()
+            .map(JsValue::from)
+            .collect::<Array>()
+            .unchecked_into::<StringArray>()
+    }
+
+    fn internal_intersect(&mut self, ray: &Ray, ray_length: f32) -> Vec<String> {
         let mut intercepting_mesh_ids: Vec<String> = Vec::new();
         match &self.bvh {
             None => return intercepting_mesh_ids,
@@ -134,7 +166,7 @@ mod tests {
         intersector.set(mesh_id, 0.0, 0.0, 0.0, 0.5);
         assert_eq!(intersector.contains(mesh_id), true);
 
-        let mut intercepting_mesh_ids: Vec<String> = intersector.intersect(
+        let mut intercepting_mesh_ids: Vec<String> = intersector.internal_intersect(
             &Ray::new(Point3::new(0.0, 1.0, 0.0), Vector3::new(0.0, -1.0, 0.0)),
             0.6,
         );
@@ -144,7 +176,7 @@ mod tests {
 
         assert_eq!(
             intersector
-                .intersect(
+                .internal_intersect(
                     &Ray::new(Point3::new(0.0, 0.0, 1.0), Vector3::new(0.0, -1.0, 0.0)),
                     0.6,
                 )
@@ -154,7 +186,7 @@ mod tests {
 
         assert_eq!(
             intersector
-                .intersect(
+                .internal_intersect(
                     &Ray::new(Point3::new(0.0, 0.0, 1.0), Vector3::new(0.0, 0.0, -1.0)),
                     0.6,
                 )

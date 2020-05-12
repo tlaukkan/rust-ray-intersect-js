@@ -119,6 +119,12 @@ extern "C" {
 }
 
 #[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(typescript_type = "Array<String>")]
+    pub type StringArray;
+}
+
+#[wasm_bindgen]
 pub fn ray_intersect(
     mesh_id: &str,
     origin_x: f32,

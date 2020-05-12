@@ -1,5 +1,13 @@
 import {expect} from 'chai';
-import {has_mesh, init_panic_hook, IntersectResult, ray_intersect, remove_mesh, set_mesh} from 'rust-ray-intersect';
+import {
+    has_mesh,
+    init_panic_hook,
+    IntersectResult,
+    MeshIntersector,
+    ray_intersect,
+    remove_mesh,
+    set_mesh
+} from 'rust-ray-intersect';
 
 import * as BABYLON from 'babylonjs';
 // Force loading loaders.
@@ -146,21 +154,24 @@ describe('Test ray intersect.', () => {
 
         const meshId = 'test-mesh';
 
-        expect(has_mesh(meshId)).eq(false);
+        const intersector = new MeshIntersector();
 
-        set_mesh(meshId, indices, positions);
 
-        expect(has_mesh(meshId)).eq(true);
+        expect(intersector.has(meshId)).eq(false);
 
-        const result: IntersectResult[] = ray_intersect(meshId, 0, 1, 0, 0, -1, 0);
+        expect(intersector.set(meshId, indices, positions)).eq(0.8660253882408142);
+
+        expect(intersector.has(meshId)).eq(true);
+
+        const result: IntersectResult[] = intersector.intersect( 0, 1, 0, 0, -1, 0, meshId);
         expect(result.length).eq(4);
         expect(result[0].hit).eq(true);
         expect(result[0].distance).eq(0.5);
         result[0].free();
         result[1].free();
 
-        expect(remove_mesh(meshId)).eq(true);
-        expect(has_mesh(meshId)).eq(false);
+        expect(intersector.remove(meshId)).eq(true);
+        expect(intersector.has(meshId)).eq(false);
 
     }).timeout(10000);
 
