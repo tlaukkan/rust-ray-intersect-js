@@ -104,12 +104,12 @@ pub fn ray_intersect(
             result.v = candidate.v;
             result.triangle_index = triangle.index;
         } else {
-            let inverseCandidate = ray.intersects_triangle(&triangle.c, &triangle.b, &triangle.a);
-            if inverseCandidate.distance < result.distance {
+            let inverse_candidate = ray.intersects_triangle(&triangle.c, &triangle.b, &triangle.a);
+            if inverse_candidate.distance < result.distance {
                 result.hit = true;
-                result.distance = inverseCandidate.distance;
-                result.u = inverseCandidate.u;
-                result.v = inverseCandidate.v;
+                result.distance = inverse_candidate.distance;
+                result.u = inverse_candidate.u;
+                result.v = inverse_candidate.v;
                 result.triangle_index = triangle.index;
             }
         }
