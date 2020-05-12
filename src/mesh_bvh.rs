@@ -29,7 +29,7 @@ impl Intersector {
         return self.meshes.contains_key(&mesh_id_string);
     }
 
-    pub fn internal_remove_mesh(&mut self, mesh_id: &str) -> bool {
+    pub fn remove_mesh(&mut self, mesh_id: &str) -> bool {
         let key = mesh_id.to_string();
         if self.meshes.contains_key(&key) {
             let mesh = self.meshes.get(&key).unwrap();
@@ -104,15 +104,6 @@ impl Intersector {
         ray_length: f32,
         intercepting_mesh_ids: &mut Vec<String>,
     ) {
-        self.mesh_ray_intersect(ray, ray_length, intercepting_mesh_ids);
-    }
-
-    fn mesh_ray_intersect(
-        &mut self,
-        ray: &Ray,
-        ray_length: f32,
-        intercepting_mesh_ids: &mut Vec<String>,
-    ) {
         match &self.bvh {
             None => return,
             Some(bvh) => {
@@ -138,13 +129,17 @@ impl Intersector {
     ) {
         if self.meshes.contains_key(mesh_id) {
             let mesh: &Mesh = self.meshes.get(mesh_id).unwrap();
-            triangle_ray_intersect(local_ray, mesh, intercepts);
+            internal_intersect_triangles(local_ray, mesh, intercepts);
         }
         intercepts.sort_by(|a, b| (a.distance).partial_cmp(&b.distance).unwrap());
     }
 }
 
-fn triangle_ray_intersect(local_ray: &Ray, mesh: &Mesh, intercepts: &mut Vec<IntersectResult>) {
+fn internal_intersect_triangles(
+    local_ray: &Ray,
+    mesh: &Mesh,
+    intercepts: &mut Vec<IntersectResult>,
+) {
     let hits = mesh.bvh.traverse(&local_ray, &mesh.triangles);
 
     for triangle in hits {
@@ -216,7 +211,7 @@ mod tests {
         assert_eq!(intercepts[0].hit, true);
         assert_eq!(intercepts[0].distance, 0.5);
 
-        assert_eq!(intersector.internal_remove_mesh(&mesh_id), true);
+        assert_eq!(intersector.remove_mesh(&mesh_id), true);
         assert_eq!(intersector.has_mesh(&mesh_id), false);
     }
 }
