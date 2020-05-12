@@ -1,12 +1,9 @@
 import {expect} from 'chai';
 import {
-    has_mesh,
     init_panic_hook,
     IntersectResult,
     MeshIntersector,
-    ray_intersect,
-    remove_mesh,
-    set_mesh, SphereIntersector
+    SphereIntersector
 } from 'rust-ray-intersect';
 
 import * as BABYLON from 'babylonjs';
@@ -19,8 +16,8 @@ import Vector3 = BABYLON.Vector3;
 
 const gltfLoaderCoordinateSystemMode = GLTFLoaderCoordinateSystemMode;
 
-const get_3d_position = (origin: Vector3, direction: Vector3, distance: number, meshId: string): Vector3[]|null => {
-    let result = ray_intersect(meshId, origin.x, origin.y, origin.z, direction.x, direction.y, direction.z);
+const get_3d_position = (intersector: MeshIntersector, origin: Vector3, direction: Vector3, distance: number, meshId: string): Vector3[]|null => {
+    let result = intersector.intersect(origin.x, origin.y, origin.z, direction.x, direction.y, direction.z, meshId);
     if (result.length === 0){
         return null;
     }
@@ -37,6 +34,8 @@ const get_3d_position = (origin: Vector3, direction: Vector3, distance: number, 
 describe('Test ray intersect.', () => {
     it('Test Babylon Headless.', (done) => {
         (global as any).XMLHttpRequest = require('xhr2').XMLHttpRequest;
+
+        const intersector = new MeshIntersector();
 
         const engine = new BABYLON.NullEngine();
         const scene = new BABYLON.Scene(engine);
@@ -64,12 +63,12 @@ describe('Test ray intersect.', () => {
 
                 //time test rusty
                 const meshId = 'test2-mesh';
-                set_mesh(meshId, new Uint32Array(indices), position as Float32Array);
+                intersector.set(meshId, new Uint32Array(indices), position as Float32Array);
 
-                let position_intersects = get_3d_position(Origin, Direction, MaxDistance, meshId);
+                let position_intersects = get_3d_position(intersector, Origin, Direction, MaxDistance, meshId);
                 const t0 = Date.now()
                 for (let i = 0; i < 10000; i++) {
-                    position_intersects = get_3d_position(Origin, Direction, MaxDistance, meshId);
+                    position_intersects = get_3d_position(intersector, Origin, Direction, MaxDistance, meshId);
                 }
                 const t1 = Date.now()
                 if(position_intersects){
@@ -77,8 +76,8 @@ describe('Test ray intersect.', () => {
                 }
 
                 //
-                expect(remove_mesh(meshId)).eq(true);
-                expect(has_mesh(meshId)).eq(false);
+                expect(intersector.remove(meshId)).eq(true);
+                expect(intersector.has(meshId)).eq(false);
 
 
                 // Time Babylonjs raycast.

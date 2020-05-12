@@ -1,8 +1,10 @@
-use crate::{model, IntersectResult, IntersectResultArray};
+use crate::model;
 use bvh::ray::Ray;
 use js_sys::Array;
+use model::IntersectResult;
+use model::IntersectResultArray;
 use model::Mesh;
-use nalgebra::{distance, Point3, Vector3};
+use nalgebra::{Point3, Vector3};
 use std::collections::HashMap;
 use std::panic;
 use wasm_bindgen::prelude::*;
@@ -150,10 +152,10 @@ mod tests {
         assert_eq!(intersector.set(mesh_id, indices, positions), 0.8660254);
         assert_eq!(intersector.has(mesh_id), true);
 
-        let origin = Point3::new(0.0, 1.0, 0.0);
-        let hittingRay = Ray::new(Point3::new(0.0, 1.0, 0.0), Vector3::new(0.0, -1.0, 0.0));
-
-        let intercepts = intersector.internal_intersect(&hittingRay, &mesh_id);
+        let intercepts = intersector.internal_intersect(
+            &Ray::new(Point3::new(0.0, 1.0, 0.0), Vector3::new(0.0, -1.0, 0.0)),
+            &mesh_id,
+        );
         assert_eq!(intercepts.len(), 4);
         assert_eq!(intercepts[0].hit, true);
         assert_eq!(intercepts[0].distance, 0.5);

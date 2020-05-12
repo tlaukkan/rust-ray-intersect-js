@@ -1,7 +1,43 @@
 use bvh::aabb::{Bounded, AABB};
 use bvh::bounding_hierarchy::BHShape;
 use bvh::bvh::BVH;
-use nalgebra::{Point, Point3, Vector3};
+use nalgebra::{Point3, Vector3};
+use wasm_bindgen::prelude::*;
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(typescript_type = "Array<IntersectResult>")]
+    pub type IntersectResultArray;
+}
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(typescript_type = "Array<String>")]
+    pub type StringArray;
+}
+
+#[wasm_bindgen]
+pub struct IntersectResult {
+    pub hit: bool,
+    pub triangle_index: u32,
+    pub u: f32,
+    pub v: f32,
+    pub distance: f32,
+}
+
+#[wasm_bindgen]
+impl IntersectResult {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> IntersectResult {
+        IntersectResult {
+            hit: false,
+            triangle_index: 0,
+            u: 0.0,
+            v: 0.0,
+            distance: 0.0,
+        }
+    }
+}
 
 pub struct Mesh {
     pub mesh_id: String,

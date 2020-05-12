@@ -1,4 +1,4 @@
-import {init, has_mesh, init_panic_hook, IntersectResult, ray_intersect, set_mesh} from "../../../pkg";
+import {init} from "../../../pkg";
 
 init().then(
     () => {

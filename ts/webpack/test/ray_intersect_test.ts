@@ -1,10 +1,6 @@
 import {expect} from 'chai';
 import {
     init_panic_hook,
-    ray_intersect,
-    set_mesh,
-    has_mesh,
-    remove_mesh,
     IntersectResult,
     init, MeshIntersector, SphereIntersector
 } from 'rust-ray-intersect';
