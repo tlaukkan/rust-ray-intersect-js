@@ -114,8 +114,23 @@ impl SphereIntersectorJS {
     }
 
     #[wasm_bindgen]
-    pub fn set(&mut self, id: &str, x: f32, y: f32, z: f32, radius: f32) {
-        self.intersector.set(id, x, y, z, radius);
+    pub fn add(&mut self, id: &str, x: f32, y: f32, z: f32, radius: f32) {
+        self.intersector.add(id, x, y, z, radius);
+    }
+
+    #[wasm_bindgen]
+    pub fn update(&mut self, id: &str, x: f32, y: f32, z: f32, radius: f32) {
+        self.intersector.update(id, x, y, z, radius);
+    }
+
+    #[wasm_bindgen]
+    pub fn build(&mut self) {
+        self.intersector.build();
+    }
+
+    #[wasm_bindgen]
+    pub fn optimize(&mut self) {
+        self.intersector.optimize();
     }
 
     #[wasm_bindgen]

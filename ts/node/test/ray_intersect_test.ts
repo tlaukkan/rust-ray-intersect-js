@@ -183,7 +183,8 @@ describe('Test ray intersect.', () => {
 
         expect(intersector.has(id)).eq(false);
 
-        expect(intersector.set(id, 0, 0, 0, 1));
+        expect(intersector.add(id, 0, 0, 0, 1));
+        expect(intersector.build());
 
         expect(intersector.has(id)).eq(true);
 
@@ -192,6 +193,7 @@ describe('Test ray intersect.', () => {
         expect(result[0]).eq(id);
 
         expect(intersector.remove(id)).eq(true);
+        expect(intersector.build());
         expect(intersector.has(id)).eq(false);
 
     }).timeout(10000);

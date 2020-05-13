@@ -4,12 +4,13 @@ use bvh::bvh::BVH;
 use bvh::ray::Ray;
 use model::Sphere;
 use nalgebra::{distance, Point3};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 pub struct SphereIntersector {
     spheres: Vec<Sphere>,
     sphere_map: HashMap<String, Sphere>,
     bvh: Option<BVH>,
+    changed_sphere_indices: HashSet<usize>,
 }
 
 impl SphereIntersector {
@@ -19,6 +20,7 @@ impl SphereIntersector {
             bvh: None,
             spheres,
             sphere_map: HashMap::new(),
+            changed_sphere_indices: HashSet::new(),
         }
     }
 
@@ -37,12 +39,6 @@ impl SphereIntersector {
                 let sphere_index = sphere_index_result.unwrap();
                 self.spheres.remove(sphere_index);
             }
-            // Rebuild BVH.
-            if self.spheres.len() > 0 {
-                self.bvh = Some(BVH::build(&mut self.spheres));
-            } else {
-                self.bvh = None;
-            }
             self.sphere_map.remove(&key);
             true
         } else {
@@ -50,7 +46,7 @@ impl SphereIntersector {
         }
     }
 
-    pub fn set(&mut self, id: &str, x: f32, y: f32, z: f32, radius: f32) {
+    pub fn add(&mut self, id: &str, x: f32, y: f32, z: f32, radius: f32) {
         let sphere: Sphere = Sphere {
             id: id.to_string(),
             position: Point3::new(x, y, z),
@@ -70,8 +66,6 @@ impl SphereIntersector {
             // Push new sphere.
             spheres.push(sphere.clone());
         }
-        // Rebuild BVH.
-        self.bvh = Some(BVH::build(&mut self.spheres));
 
         // Store mesh.
         let key = id.to_string();
@@ -79,6 +73,46 @@ impl SphereIntersector {
             self.sphere_map.remove(&key);
         }
         self.sphere_map.insert(id.to_string(), sphere);
+    }
+
+    /// Builds or rebuilds BVH.
+    pub fn build(&mut self) {
+        if self.spheres.len() > 0 {
+            self.bvh = Some(BVH::build(&mut self.spheres));
+        } else {
+            self.bvh = None;
+        }
+        self.changed_sphere_indices.clear();
+    }
+
+    pub fn update(&mut self, id: &str, x: f32, y: f32, z: f32, radius: f32) -> bool {
+        let id = id.to_string();
+        let spheres = &mut self.spheres;
+        let sphere_index_result = spheres.iter().position(|r| r.id == id);
+        if sphere_index_result.is_some() {
+            // Updating existing sphere.
+            let sphere_index = sphere_index_result.unwrap();
+            let mut existing_sphere = spheres.get_mut(sphere_index).unwrap();
+            existing_sphere.position.x = x;
+            existing_sphere.position.y = y;
+            existing_sphere.position.z = z;
+            existing_sphere.radius = radius;
+            self.changed_sphere_indices.insert(sphere_index);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /// Optimizes BVH according to updated spheres.
+    pub fn optimize(&mut self) {
+        if self.bvh.is_some() {
+            self.bvh
+                .as_mut()
+                .unwrap()
+                .optimize(&self.changed_sphere_indices, &self.spheres);
+        }
+        self.changed_sphere_indices.clear();
     }
 
     pub fn intersect(&mut self, ray: &Ray, ray_length: f32) -> Vec<String> {
@@ -119,8 +153,10 @@ mod tests {
         let id = "1";
 
         assert_eq!(intersector.has(id), false);
-        intersector.set(id, 0.0, 0.0, 0.0, 0.5);
+        intersector.add(id, 0.0, 0.0, 0.0, 0.5);
         assert_eq!(intersector.has(id), true);
+
+        intersector.build();
 
         let intercepting_ids: Vec<String> = intersector.intersect(
             &Ray::new(Point3::new(0.0, 1.0, 0.0), Vector3::new(0.0, -1.0, 0.0)),
@@ -150,7 +186,69 @@ mod tests {
             1
         );
 
+        intersector.update(id, 5.0, 0.0, 0.0, 0.5);
+
+        intersector.build();
+
+        assert_eq!(
+            intersector
+                .intersect(
+                    &Ray::new(Point3::new(0.0, 1.0, 0.0), Vector3::new(0.0, -1.0, 0.0)),
+                    0.6,
+                )
+                .len(),
+            0
+        );
+        assert_eq!(
+            intersector
+                .intersect(
+                    &Ray::new(Point3::new(0.0, 0.0, 1.0), Vector3::new(0.0, -1.0, 0.0)),
+                    0.6,
+                )
+                .len(),
+            0
+        );
+        assert_eq!(
+            intersector
+                .intersect(
+                    &Ray::new(Point3::new(0.0, 0.0, 1.0), Vector3::new(0.0, 0.0, -1.0)),
+                    0.6,
+                )
+                .len(),
+            0
+        );
+
+        assert_eq!(
+            intersector
+                .intersect(
+                    &Ray::new(Point3::new(5.0, 1.0, 0.0), Vector3::new(0.0, -1.0, 0.0)),
+                    0.6,
+                )
+                .len(),
+            1
+        );
+        assert_eq!(
+            intersector
+                .intersect(
+                    &Ray::new(Point3::new(5.0, 0.0, 1.0), Vector3::new(0.0, -1.0, 0.0)),
+                    0.6,
+                )
+                .len(),
+            0
+        );
+        assert_eq!(
+            intersector
+                .intersect(
+                    &Ray::new(Point3::new(5.0, 0.0, 1.0), Vector3::new(0.0, 0.0, -1.0)),
+                    0.6,
+                )
+                .len(),
+            1
+        );
+
         assert_eq!(intersector.remove(&id), true);
+        intersector.build();
+
         assert_eq!(intersector.has(&id), false);
     }
 }

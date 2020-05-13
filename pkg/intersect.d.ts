@@ -92,7 +92,21 @@ export class SphereIntersectorJS {
    * @param {number} z
    * @param {number} radius
    */
-  set(id: string, x: number, y: number, z: number, radius: number): void;
+  add(id: string, x: number, y: number, z: number, radius: number): void;
+  /**
+   * @param {string} id
+   * @param {number} x
+   * @param {number} y
+   * @param {number} z
+   * @param {number} radius
+   */
+  update(id: string, x: number, y: number, z: number, radius: number): void;
+  /**
+   */
+  build(): void;
+  /**
+   */
+  optimize(): void;
   /**
    * @param {number} origin_x
    * @param {number} origin_y

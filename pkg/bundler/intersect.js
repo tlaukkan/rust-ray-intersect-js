@@ -400,10 +400,32 @@ export class SphereIntersectorJS {
      * @param {number} z
      * @param {number} radius
      */
-    set(id, x, y, z, radius) {
+    add(id, x, y, z, radius) {
         var ptr0 = passStringToWasm0(id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.sphereintersectorjs_set(this.ptr, ptr0, len0, x, y, z, radius);
+        wasm.sphereintersectorjs_add(this.ptr, ptr0, len0, x, y, z, radius);
+    }
+    /**
+     * @param {string} id
+     * @param {number} x
+     * @param {number} y
+     * @param {number} z
+     * @param {number} radius
+     */
+    update(id, x, y, z, radius) {
+        var ptr0 = passStringToWasm0(id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        wasm.sphereintersectorjs_update(this.ptr, ptr0, len0, x, y, z, radius);
+    }
+    /**
+     */
+    build() {
+        wasm.sphereintersectorjs_build(this.ptr);
+    }
+    /**
+     */
+    optimize() {
+        wasm.sphereintersectorjs_optimize(this.ptr);
     }
     /**
      * @param {number} origin_x
