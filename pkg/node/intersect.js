@@ -47,6 +47,11 @@ function addHeapObject(obj) {
     heap[idx] = obj;
     return idx;
 }
+/**
+*/
+module.exports.init_panic_hook = function() {
+    wasm.init_panic_hook();
+};
 
 let WASM_VECTOR_LEN = 0;
 
@@ -66,61 +71,36 @@ function passStringToWasm0(arg, malloc) {
     WASM_VECTOR_LEN = len;
     return ptr;
 }
-/**
-* @param {string} mesh_id
-* @returns {boolean}
-*/
-module.exports.has_mesh = function(mesh_id) {
-    var ptr0 = passStringToWasm0(mesh_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    var len0 = WASM_VECTOR_LEN;
-    var ret = wasm.has_mesh(ptr0, len0);
-    return ret !== 0;
-};
 
-/**
-* @param {string} mesh_id
-* @param {Uint32Array} indices
-* @param {Float32Array} positions
-*/
-module.exports.set_mesh = function(mesh_id, indices, positions) {
-    var ptr0 = passStringToWasm0(mesh_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    var len0 = WASM_VECTOR_LEN;
-    wasm.set_mesh(ptr0, len0, addHeapObject(indices), addHeapObject(positions));
-};
+let cachegetUint32Memory0 = null;
+function getUint32Memory0() {
+    if (cachegetUint32Memory0 === null || cachegetUint32Memory0.buffer !== wasm.memory.buffer) {
+        cachegetUint32Memory0 = new Uint32Array(wasm.memory.buffer);
+    }
+    return cachegetUint32Memory0;
+}
 
-/**
-* @param {string} mesh_id
-* @returns {boolean}
-*/
-module.exports.remove_mesh = function(mesh_id) {
-    var ptr0 = passStringToWasm0(mesh_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    var len0 = WASM_VECTOR_LEN;
-    var ret = wasm.remove_mesh(ptr0, len0);
-    return ret !== 0;
-};
+function passArray32ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 4);
+    getUint32Memory0().set(arg, ptr / 4);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
 
-/**
-* @param {string} mesh_id
-* @param {number} origin_x
-* @param {number} origin_y
-* @param {number} origin_z
-* @param {number} direction_x
-* @param {number} direction_y
-* @param {number} direction_z
-* @returns {Array<IntersectResult>}
-*/
-module.exports.ray_intersect = function(mesh_id, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z) {
-    var ptr0 = passStringToWasm0(mesh_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    var len0 = WASM_VECTOR_LEN;
-    var ret = wasm.ray_intersect(ptr0, len0, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z);
-    return takeObject(ret);
-};
+let cachegetFloat32Memory0 = null;
+function getFloat32Memory0() {
+    if (cachegetFloat32Memory0 === null || cachegetFloat32Memory0.buffer !== wasm.memory.buffer) {
+        cachegetFloat32Memory0 = new Float32Array(wasm.memory.buffer);
+    }
+    return cachegetFloat32Memory0;
+}
 
-/**
-*/
-module.exports.init_panic_hook = function() {
-    wasm.init_panic_hook();
-};
+function passArrayF32ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 4);
+    getFloat32Memory0().set(arg, ptr / 4);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
 
 let cachegetInt32Memory0 = null;
 function getInt32Memory0() {
@@ -219,13 +199,166 @@ class IntersectResult {
     }
 }
 module.exports.IntersectResult = IntersectResult;
+/**
+*/
+class MeshIntersectorJS {
+
+    static __wrap(ptr) {
+        const obj = Object.create(MeshIntersectorJS.prototype);
+        obj.ptr = ptr;
+
+        return obj;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+
+        wasm.__wbg_meshintersectorjs_free(ptr);
+    }
+    /**
+    */
+    constructor() {
+        var ret = wasm.meshintersectorjs_new();
+        return MeshIntersectorJS.__wrap(ret);
+    }
+    /**
+    * @param {string} mesh_id
+    * @returns {boolean}
+    */
+    has(mesh_id) {
+        var ptr0 = passStringToWasm0(mesh_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        var ret = wasm.meshintersectorjs_has(this.ptr, ptr0, len0);
+        return ret !== 0;
+    }
+    /**
+    * @param {string} mesh_id
+    * @returns {boolean}
+    */
+    remove(mesh_id) {
+        var ptr0 = passStringToWasm0(mesh_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        var ret = wasm.meshintersectorjs_remove(this.ptr, ptr0, len0);
+        return ret !== 0;
+    }
+    /**
+    * @param {string} mesh_id
+    * @param {Uint32Array} indices
+    * @param {Float32Array} positions
+    * @returns {number}
+    */
+    set(mesh_id, indices, positions) {
+        var ptr0 = passStringToWasm0(mesh_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        var ptr1 = passArray32ToWasm0(indices, wasm.__wbindgen_malloc);
+        var len1 = WASM_VECTOR_LEN;
+        var ptr2 = passArrayF32ToWasm0(positions, wasm.__wbindgen_malloc);
+        var len2 = WASM_VECTOR_LEN;
+        var ret = wasm.meshintersectorjs_set(this.ptr, ptr0, len0, ptr1, len1, ptr2, len2);
+        return ret;
+    }
+    /**
+    * @param {number} origin_x
+    * @param {number} origin_y
+    * @param {number} origin_z
+    * @param {number} direction_x
+    * @param {number} direction_y
+    * @param {number} direction_z
+    * @param {string} mesh_id
+    * @returns {Array<IntersectResult>}
+    */
+    intersect(origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, mesh_id) {
+        var ptr0 = passStringToWasm0(mesh_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        var ret = wasm.meshintersectorjs_intersect(this.ptr, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, ptr0, len0);
+        return takeObject(ret);
+    }
+}
+module.exports.MeshIntersectorJS = MeshIntersectorJS;
+/**
+*/
+class SphereIntersectorJS {
+
+    static __wrap(ptr) {
+        const obj = Object.create(SphereIntersectorJS.prototype);
+        obj.ptr = ptr;
+
+        return obj;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+
+        wasm.__wbg_sphereintersectorjs_free(ptr);
+    }
+    /**
+    */
+    constructor() {
+        var ret = wasm.sphereintersectorjs_new();
+        return SphereIntersectorJS.__wrap(ret);
+    }
+    /**
+    * @param {string} id
+    * @returns {boolean}
+    */
+    has(id) {
+        var ptr0 = passStringToWasm0(id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        var ret = wasm.sphereintersectorjs_has(this.ptr, ptr0, len0);
+        return ret !== 0;
+    }
+    /**
+    * @param {string} id
+    * @returns {boolean}
+    */
+    remove(id) {
+        var ptr0 = passStringToWasm0(id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        var ret = wasm.sphereintersectorjs_remove(this.ptr, ptr0, len0);
+        return ret !== 0;
+    }
+    /**
+    * @param {string} id
+    * @param {number} x
+    * @param {number} y
+    * @param {number} z
+    * @param {number} radius
+    */
+    set(id, x, y, z, radius) {
+        var ptr0 = passStringToWasm0(id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        wasm.sphereintersectorjs_set(this.ptr, ptr0, len0, x, y, z, radius);
+    }
+    /**
+    * @param {number} origin_x
+    * @param {number} origin_y
+    * @param {number} origin_z
+    * @param {number} direction_x
+    * @param {number} direction_y
+    * @param {number} direction_z
+    * @param {number} ray_length
+    * @returns {Array<String>}
+    */
+    intersect(origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, ray_length) {
+        var ret = wasm.sphereintersectorjs_intersect(this.ptr, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, ray_length);
+        return takeObject(ret);
+    }
+}
+module.exports.SphereIntersectorJS = SphereIntersectorJS;
+
+module.exports.__wbg_intersectresult_new = function(arg0) {
+    var ret = IntersectResult.__wrap(arg0);
+    return addHeapObject(ret);
+};
 
 module.exports.__wbindgen_object_drop_ref = function(arg0) {
     takeObject(arg0);
 };
 
-module.exports.__wbg_intersectresult_new = function(arg0) {
-    var ret = IntersectResult.__wrap(arg0);
+module.exports.__wbindgen_string_new = function(arg0, arg1) {
+    var ret = getStringFromWasm0(arg0, arg1);
     return addHeapObject(ret);
 };
 
@@ -260,46 +393,8 @@ module.exports.__wbg_push_46274b393147c746 = function(arg0, arg1) {
     return ret;
 };
 
-module.exports.__wbg_buffer_eb5185aa4a8e9c62 = function(arg0) {
-    var ret = getObject(arg0).buffer;
-    return addHeapObject(ret);
-};
-
-module.exports.__wbg_new_425c4bc0e35ec22f = function(arg0) {
-    var ret = new Uint32Array(getObject(arg0));
-    return addHeapObject(ret);
-};
-
-module.exports.__wbg_set_c6918ca5977a5b66 = function(arg0, arg1, arg2) {
-    getObject(arg0).set(getObject(arg1), arg2 >>> 0);
-};
-
-module.exports.__wbg_length_81dcf4356abac381 = function(arg0) {
-    var ret = getObject(arg0).length;
-    return ret;
-};
-
-module.exports.__wbg_new_470473004db6a289 = function(arg0) {
-    var ret = new Float32Array(getObject(arg0));
-    return addHeapObject(ret);
-};
-
-module.exports.__wbg_set_47b2beca3d5c9e3f = function(arg0, arg1, arg2) {
-    getObject(arg0).set(getObject(arg1), arg2 >>> 0);
-};
-
-module.exports.__wbg_length_2f682a6b8ac0fb07 = function(arg0) {
-    var ret = getObject(arg0).length;
-    return ret;
-};
-
 module.exports.__wbindgen_throw = function(arg0, arg1) {
     throw new Error(getStringFromWasm0(arg0, arg1));
-};
-
-module.exports.__wbindgen_memory = function() {
-    var ret = wasm.memory;
-    return addHeapObject(ret);
 };
 
 const path = require('path').join(__dirname, 'intersect_bg.wasm');

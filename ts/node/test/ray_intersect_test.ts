@@ -1,5 +1,10 @@
 import {expect} from 'chai';
-import {has_mesh, init_panic_hook, IntersectResult, ray_intersect, remove_mesh, set_mesh} from 'rust-ray-intersect';
+import {
+    init_panic_hook,
+    IntersectResult,
+    MeshIntersectorJS,
+    SphereIntersectorJS
+} from 'rust-ray-intersect';
 
 import * as BABYLON from 'babylonjs';
 // Force loading loaders.
@@ -11,8 +16,8 @@ import Vector3 = BABYLON.Vector3;
 
 const gltfLoaderCoordinateSystemMode = GLTFLoaderCoordinateSystemMode;
 
-const get_3d_position = (origin: Vector3, direction: Vector3, distance: number, meshId: string): Vector3[]|null => {
-    let result = ray_intersect(meshId, origin.x, origin.y, origin.z, direction.x, direction.y, direction.z);
+const get_3d_position = (intersector: MeshIntersectorJS, origin: Vector3, direction: Vector3, distance: number, meshId: string): Vector3[]|null => {
+    let result = intersector.intersect(origin.x, origin.y, origin.z, direction.x, direction.y, direction.z, meshId);
     if (result.length === 0){
         return null;
     }
@@ -29,6 +34,8 @@ const get_3d_position = (origin: Vector3, direction: Vector3, distance: number, 
 describe('Test ray intersect.', () => {
     it('Test Babylon Headless.', (done) => {
         (global as any).XMLHttpRequest = require('xhr2').XMLHttpRequest;
+
+        const intersector = new MeshIntersectorJS();
 
         const engine = new BABYLON.NullEngine();
         const scene = new BABYLON.Scene(engine);
@@ -56,12 +63,12 @@ describe('Test ray intersect.', () => {
 
                 //time test rusty
                 const meshId = 'test2-mesh';
-                set_mesh(meshId, new Uint32Array(indices), position as Float32Array);
+                intersector.set(meshId, new Uint32Array(indices), position as Float32Array);
 
-                let position_intersects = get_3d_position(Origin, Direction, MaxDistance, meshId);
+                let position_intersects = get_3d_position(intersector, Origin, Direction, MaxDistance, meshId);
                 const t0 = Date.now()
                 for (let i = 0; i < 10000; i++) {
-                    position_intersects = get_3d_position(Origin, Direction, MaxDistance, meshId);
+                    position_intersects = get_3d_position(intersector, Origin, Direction, MaxDistance, meshId);
                 }
                 const t1 = Date.now()
                 if(position_intersects){
@@ -69,8 +76,8 @@ describe('Test ray intersect.', () => {
                 }
 
                 //
-                expect(remove_mesh(meshId)).eq(true);
-                expect(has_mesh(meshId)).eq(false);
+                expect(intersector.remove(meshId)).eq(true);
+                expect(intersector.has(meshId)).eq(false);
 
 
                 // Time Babylonjs raycast.
@@ -99,7 +106,7 @@ describe('Test ray intersect.', () => {
 
     }).timeout(20000);
 
-    it('Should test ray intersect.', async () => {
+    it('Should test ray mesh intersect.', async () => {
         init_panic_hook();
 
         const indices = new Uint32Array([
@@ -146,22 +153,46 @@ describe('Test ray intersect.', () => {
 
         const meshId = 'test-mesh';
 
-        expect(has_mesh(meshId)).eq(false);
+        const intersector = new MeshIntersectorJS();
 
-        set_mesh(meshId, indices, positions);
 
-        expect(has_mesh(meshId)).eq(true);
+        expect(intersector.has(meshId)).eq(false);
 
-        const result: IntersectResult[] = ray_intersect(meshId, 0, 1, 0, 0, -1, 0);
+        expect(intersector.set(meshId, indices, positions)).eq(0.8660253882408142);
+
+        expect(intersector.has(meshId)).eq(true);
+
+        const result: IntersectResult[] = intersector.intersect( 0, 1, 0, 0, -1, 0, meshId);
         expect(result.length).eq(4);
         expect(result[0].hit).eq(true);
         expect(result[0].distance).eq(0.5);
         result[0].free();
         result[1].free();
 
-        expect(remove_mesh(meshId)).eq(true);
-        expect(has_mesh(meshId)).eq(false);
+        expect(intersector.remove(meshId)).eq(true);
+        expect(intersector.has(meshId)).eq(false);
 
     }).timeout(10000);
 
+    it('Should test ray sphere intersect.', async () => {
+        init_panic_hook();
+
+        const id = 'test-mesh';
+
+        const intersector = new SphereIntersectorJS();
+
+        expect(intersector.has(id)).eq(false);
+
+        expect(intersector.set(id, 0, 0, 0, 1));
+
+        expect(intersector.has(id)).eq(true);
+
+        const result: String[] = intersector.intersect( 0, 1, 0, 0, -1, 0, 1);
+        expect(result.length).eq(1);
+        expect(result[0]).eq(id);
+
+        expect(intersector.remove(id)).eq(true);
+        expect(intersector.has(id)).eq(false);
+
+    }).timeout(10000);
 });

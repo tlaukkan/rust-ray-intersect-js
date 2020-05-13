@@ -3,6 +3,7 @@
     <words>
       <w>aabb</w>
       <w>bindgen</w>
+      <w>intersector</w>
       <w>wasm</w>
     </words>
   </dictionary>
