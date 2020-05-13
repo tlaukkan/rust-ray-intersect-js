@@ -57,16 +57,17 @@ export class MeshIntersectorJS {
    */
   set(mesh_id: string, indices: Uint32Array, positions: Float32Array): number;
   /**
+   * @param {string} mesh_id
    * @param {number} origin_x
    * @param {number} origin_y
    * @param {number} origin_z
    * @param {number} direction_x
    * @param {number} direction_y
    * @param {number} direction_z
-   * @param {string} mesh_id
+   * @param {number} ray_length
    * @returns {Array<IntersectResult>}
    */
-  intersect(origin_x: number, origin_y: number, origin_z: number, direction_x: number, direction_y: number, direction_z: number, mesh_id: string): Array<IntersectResult>;
+  intersect(mesh_id: string, origin_x: number, origin_y: number, origin_z: number, direction_x: number, direction_y: number, direction_z: number, ray_length: number): Array<IntersectResult>;
 }
 /**
  */

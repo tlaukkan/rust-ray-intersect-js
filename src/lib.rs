@@ -69,19 +69,20 @@ impl MeshIntersectorJS {
     #[wasm_bindgen]
     pub fn intersect(
         &mut self,
+        mesh_id: &str,
         origin_x: f32,
         origin_y: f32,
         origin_z: f32,
         direction_x: f32,
         direction_y: f32,
         direction_z: f32,
-        mesh_id: &str,
+        ray_length: f32,
     ) -> IntersectResultArray {
         let origin = Point3::new(origin_x, origin_y, origin_z);
         let direction = Vector3::new(direction_x, direction_y, direction_z);
         let ray = Ray::new(origin, direction);
         self.intersector
-            .intersect(&ray, mesh_id)
+            .intersect(mesh_id, &ray, ray_length)
             .into_iter()
             .map(JsValue::from)
             .collect::<Array>()

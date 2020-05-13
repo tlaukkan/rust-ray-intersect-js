@@ -17,7 +17,7 @@ import Vector3 = BABYLON.Vector3;
 const gltfLoaderCoordinateSystemMode = GLTFLoaderCoordinateSystemMode;
 
 const get_3d_position = (intersector: MeshIntersectorJS, origin: Vector3, direction: Vector3, distance: number, meshId: string): Vector3[]|null => {
-    let result = intersector.intersect(origin.x, origin.y, origin.z, direction.x, direction.y, direction.z, meshId);
+    let result = intersector.intersect(meshId, origin.x, origin.y, origin.z, direction.x, direction.y, direction.z, 1000);
     if (result.length === 0){
         return null;
     }
@@ -162,7 +162,7 @@ describe('Test ray intersect.', () => {
 
         expect(intersector.has(meshId)).eq(true);
 
-        const result: IntersectResult[] = intersector.intersect( 0, 1, 0, 0, -1, 0, meshId);
+        const result: IntersectResult[] = intersector.intersect(meshId, 0, 1, 0, 0, -1, 0, 2);
         expect(result.length).eq(4);
         expect(result[0].hit).eq(true);
         expect(result[0].distance).eq(0.5);

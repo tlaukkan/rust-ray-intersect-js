@@ -53,7 +53,12 @@ impl MeshIntersector {
         }
     }
 
-    pub fn intersect(&mut self, local_ray: &Ray, mesh_id: &str) -> Vec<IntersectResult> {
+    pub fn intersect(
+        &mut self,
+        mesh_id: &str,
+        local_ray: &Ray,
+        ray_length: f32,
+    ) -> Vec<IntersectResult> {
         let mut intercepts: Vec<IntersectResult> = vec![];
         if self.meshes.contains_key(mesh_id) {
             let mesh: &Mesh = self.meshes.get(mesh_id).unwrap();
@@ -62,7 +67,7 @@ impl MeshIntersector {
             for triangle in hits {
                 let candidate =
                     local_ray.intersects_triangle(&triangle.a, &triangle.b, &triangle.c);
-                if candidate.distance != core::f32::INFINITY {
+                if candidate.distance != core::f32::INFINITY && candidate.distance < ray_length {
                     let mut result: IntersectResult = IntersectResult::new();
                     result.hit = true;
                     result.distance = candidate.distance;
@@ -74,7 +79,9 @@ impl MeshIntersector {
                 } else {
                     let inverse_candidate =
                         local_ray.intersects_triangle(&triangle.c, &triangle.b, &triangle.a);
-                    if inverse_candidate.distance != core::f32::INFINITY {
+                    if inverse_candidate.distance != core::f32::INFINITY
+                        && inverse_candidate.distance < ray_length
+                    {
                         let mut result: IntersectResult = IntersectResult::new();
                         result.hit = true;
                         result.distance = inverse_candidate.distance;
@@ -121,12 +128,24 @@ mod tests {
         assert_eq!(intersector.has(mesh_id), true);
 
         let intercepts = intersector.intersect(
-            &Ray::new(Point3::new(0.0, 1.0, 0.0), Vector3::new(0.0, -1.0, 0.0)),
             &mesh_id,
+            &Ray::new(Point3::new(0.0, 1.0, 0.0), Vector3::new(0.0, -1.0, 0.0)),
+            1.0,
         );
-        assert_eq!(intercepts.len(), 4);
+        assert_eq!(intercepts.len(), 2);
         assert_eq!(intercepts[0].hit, true);
         assert_eq!(intercepts[0].distance, 0.5);
+
+        assert_eq!(
+            intersector
+                .intersect(
+                    &mesh_id,
+                    &Ray::new(Point3::new(0.0, 1.0, 0.0), Vector3::new(0.0, -1.0, 0.0)),
+                    2.0,
+                )
+                .len(),
+            4
+        );
 
         assert_eq!(intersector.remove(&mesh_id), true);
         assert_eq!(intersector.has(&mesh_id), false);

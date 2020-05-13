@@ -334,19 +334,20 @@ export class MeshIntersectorJS {
         return ret;
     }
     /**
+     * @param {string} mesh_id
      * @param {number} origin_x
      * @param {number} origin_y
      * @param {number} origin_z
      * @param {number} direction_x
      * @param {number} direction_y
      * @param {number} direction_z
-     * @param {string} mesh_id
+     * @param {number} ray_length
      * @returns {Array<IntersectResult>}
      */
-    intersect(origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, mesh_id) {
+    intersect(mesh_id, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, ray_length) {
         var ptr0 = passStringToWasm0(mesh_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        var ret = wasm.meshintersectorjs_intersect(this.ptr, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, ptr0, len0);
+        var ret = wasm.meshintersectorjs_intersect(this.ptr, ptr0, len0, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, ray_length);
         return takeObject(ret);
     }
 }

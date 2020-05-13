@@ -65,7 +65,7 @@ describe('Test ray intersect.', () => {
 
         expect(intersector.has(meshId)).eq(true);
 
-        const result: IntersectResult[] = intersector.intersect(0, 1, 0, 0, -1, 0, meshId);
+        const result: IntersectResult[] = intersector.intersect(meshId, 0, 1, 0, 0, -1, 0, 2);
         expect(result.length).eq(4);
         expect(result[0].hit).eq(true);
         expect(result[0].distance).eq(0.5);
