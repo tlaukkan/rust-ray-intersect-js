@@ -44,7 +44,7 @@ fn test_ray_intersect_with_zero_surface_area_triangles_only() {
     let ray = Ray::new(origin, direction);
 
     let intercepts: Vec<IntersectResult> = vec![];
-    let intercepts = intersector.internal_intersect(&ray, mesh_id);
+    let intercepts = intersector.intersect(&ray, mesh_id);
 
     assert_eq!(intercepts.len() > 0, true);
     let result = &intercepts[0];
@@ -86,7 +86,7 @@ fn test_ray_intersect_with_zero_surface_area_triangles() {
     let ray = Ray::new(origin, direction);
 
     let mut intercepts: Vec<IntersectResult> = vec![];
-    intercepts = intersector.internal_intersect(&ray, mesh_id);
+    intercepts = intersector.intersect(&ray, mesh_id);
     assert_eq!(intercepts.len(), 4);
     result = &intercepts[0];
 
@@ -155,7 +155,7 @@ fn test_ray_intersect_with_zero_surface_area_triangles_only_2() {
     let ray = Ray::new(origin, direction);
 
     let mut intercepts: Vec<IntersectResult> = vec![];
-    intercepts = intersector.internal_intersect(&ray, mesh_id);
+    intercepts = intersector.intersect(&ray, mesh_id);
     assert_eq!(intercepts.len() > 0, true);
     result = &intercepts[0];
 
@@ -8905,7 +8905,7 @@ fn test_ray_intersect_with_zero_surface_area_triangles_2() {
     let ray = Ray::new(origin, direction);
 
     let intercepts: Vec<IntersectResult> = vec![];
-    let intercepts = intersector.internal_intersect(ray, mesh_id);
+    let intercepts = intersector.intersect(&ray, mesh_id);
 
     assert_eq!(intercepts.len() == 0, true);
 }

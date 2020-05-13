@@ -34,7 +34,7 @@ export class IntersectResult {
 }
 /**
  */
-export class MeshIntersector {
+export class MeshIntersectorJS {
   free(): void;
   /**
    */
@@ -70,7 +70,7 @@ export class MeshIntersector {
 }
 /**
  */
-export class SphereIntersector {
+export class SphereIntersectorJS {
   free(): void;
   /**
    */

@@ -2,8 +2,8 @@ import {expect} from 'chai';
 import {
     init_panic_hook,
     IntersectResult,
-    MeshIntersector,
-    SphereIntersector
+    MeshIntersectorJS,
+    SphereIntersectorJS
 } from 'rust-ray-intersect';
 
 import * as BABYLON from 'babylonjs';
@@ -16,7 +16,7 @@ import Vector3 = BABYLON.Vector3;
 
 const gltfLoaderCoordinateSystemMode = GLTFLoaderCoordinateSystemMode;
 
-const get_3d_position = (intersector: MeshIntersector, origin: Vector3, direction: Vector3, distance: number, meshId: string): Vector3[]|null => {
+const get_3d_position = (intersector: MeshIntersectorJS, origin: Vector3, direction: Vector3, distance: number, meshId: string): Vector3[]|null => {
     let result = intersector.intersect(origin.x, origin.y, origin.z, direction.x, direction.y, direction.z, meshId);
     if (result.length === 0){
         return null;
@@ -35,7 +35,7 @@ describe('Test ray intersect.', () => {
     it('Test Babylon Headless.', (done) => {
         (global as any).XMLHttpRequest = require('xhr2').XMLHttpRequest;
 
-        const intersector = new MeshIntersector();
+        const intersector = new MeshIntersectorJS();
 
         const engine = new BABYLON.NullEngine();
         const scene = new BABYLON.Scene(engine);
@@ -153,7 +153,7 @@ describe('Test ray intersect.', () => {
 
         const meshId = 'test-mesh';
 
-        const intersector = new MeshIntersector();
+        const intersector = new MeshIntersectorJS();
 
 
         expect(intersector.has(meshId)).eq(false);
@@ -179,7 +179,7 @@ describe('Test ray intersect.', () => {
 
         const id = 'test-mesh';
 
-        const intersector = new SphereIntersector();
+        const intersector = new SphereIntersectorJS();
 
         expect(intersector.has(id)).eq(false);
 

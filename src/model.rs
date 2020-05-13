@@ -5,18 +5,6 @@ use nalgebra::{Point3, Vector3};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(typescript_type = "Array<IntersectResult>")]
-    pub type IntersectResultArray;
-}
-
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(typescript_type = "Array<String>")]
-    pub type StringArray;
-}
-
-#[wasm_bindgen]
 pub struct IntersectResult {
     pub hit: bool,
     pub triangle_index: u32,

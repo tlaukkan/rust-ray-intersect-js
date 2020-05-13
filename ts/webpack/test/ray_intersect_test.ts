@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import {
     init_panic_hook,
     IntersectResult,
-    init, MeshIntersector, SphereIntersector
+    init, MeshIntersectorJS, SphereIntersectorJS
 } from 'rust-ray-intersect';
 
 describe('Test ray intersect.', () => {
@@ -56,7 +56,7 @@ describe('Test ray intersect.', () => {
 
         const meshId = 'test-mesh';
 
-        const intersector = new MeshIntersector();
+        const intersector = new MeshIntersectorJS();
 
 
         expect(intersector.has(meshId)).eq(false);
@@ -83,7 +83,7 @@ describe('Test ray intersect.', () => {
 
         const id = 'test-mesh';
 
-        const intersector = new SphereIntersector();
+        const intersector = new SphereIntersectorJS();
 
         expect(intersector.has(id)).eq(false);
 

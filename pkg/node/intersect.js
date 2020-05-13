@@ -201,10 +201,10 @@ class IntersectResult {
 module.exports.IntersectResult = IntersectResult;
 /**
 */
-class MeshIntersector {
+class MeshIntersectorJS {
 
     static __wrap(ptr) {
-        const obj = Object.create(MeshIntersector.prototype);
+        const obj = Object.create(MeshIntersectorJS.prototype);
         obj.ptr = ptr;
 
         return obj;
@@ -214,13 +214,13 @@ class MeshIntersector {
         const ptr = this.ptr;
         this.ptr = 0;
 
-        wasm.__wbg_meshintersector_free(ptr);
+        wasm.__wbg_meshintersectorjs_free(ptr);
     }
     /**
     */
     constructor() {
-        var ret = wasm.meshintersector_new();
-        return MeshIntersector.__wrap(ret);
+        var ret = wasm.meshintersectorjs_new();
+        return MeshIntersectorJS.__wrap(ret);
     }
     /**
     * @param {string} mesh_id
@@ -229,7 +229,7 @@ class MeshIntersector {
     has(mesh_id) {
         var ptr0 = passStringToWasm0(mesh_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        var ret = wasm.meshintersector_has(this.ptr, ptr0, len0);
+        var ret = wasm.meshintersectorjs_has(this.ptr, ptr0, len0);
         return ret !== 0;
     }
     /**
@@ -239,7 +239,7 @@ class MeshIntersector {
     remove(mesh_id) {
         var ptr0 = passStringToWasm0(mesh_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        var ret = wasm.meshintersector_remove(this.ptr, ptr0, len0);
+        var ret = wasm.meshintersectorjs_remove(this.ptr, ptr0, len0);
         return ret !== 0;
     }
     /**
@@ -255,7 +255,7 @@ class MeshIntersector {
         var len1 = WASM_VECTOR_LEN;
         var ptr2 = passArrayF32ToWasm0(positions, wasm.__wbindgen_malloc);
         var len2 = WASM_VECTOR_LEN;
-        var ret = wasm.meshintersector_set(this.ptr, ptr0, len0, ptr1, len1, ptr2, len2);
+        var ret = wasm.meshintersectorjs_set(this.ptr, ptr0, len0, ptr1, len1, ptr2, len2);
         return ret;
     }
     /**
@@ -271,17 +271,17 @@ class MeshIntersector {
     intersect(origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, mesh_id) {
         var ptr0 = passStringToWasm0(mesh_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        var ret = wasm.meshintersector_intersect(this.ptr, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, ptr0, len0);
+        var ret = wasm.meshintersectorjs_intersect(this.ptr, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, ptr0, len0);
         return takeObject(ret);
     }
 }
-module.exports.MeshIntersector = MeshIntersector;
+module.exports.MeshIntersectorJS = MeshIntersectorJS;
 /**
 */
-class SphereIntersector {
+class SphereIntersectorJS {
 
     static __wrap(ptr) {
-        const obj = Object.create(SphereIntersector.prototype);
+        const obj = Object.create(SphereIntersectorJS.prototype);
         obj.ptr = ptr;
 
         return obj;
@@ -291,13 +291,13 @@ class SphereIntersector {
         const ptr = this.ptr;
         this.ptr = 0;
 
-        wasm.__wbg_sphereintersector_free(ptr);
+        wasm.__wbg_sphereintersectorjs_free(ptr);
     }
     /**
     */
     constructor() {
-        var ret = wasm.sphereintersector_new();
-        return SphereIntersector.__wrap(ret);
+        var ret = wasm.sphereintersectorjs_new();
+        return SphereIntersectorJS.__wrap(ret);
     }
     /**
     * @param {string} id
@@ -306,7 +306,7 @@ class SphereIntersector {
     has(id) {
         var ptr0 = passStringToWasm0(id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        var ret = wasm.sphereintersector_has(this.ptr, ptr0, len0);
+        var ret = wasm.sphereintersectorjs_has(this.ptr, ptr0, len0);
         return ret !== 0;
     }
     /**
@@ -316,7 +316,7 @@ class SphereIntersector {
     remove(id) {
         var ptr0 = passStringToWasm0(id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        var ret = wasm.sphereintersector_remove(this.ptr, ptr0, len0);
+        var ret = wasm.sphereintersectorjs_remove(this.ptr, ptr0, len0);
         return ret !== 0;
     }
     /**
@@ -329,7 +329,7 @@ class SphereIntersector {
     set(id, x, y, z, radius) {
         var ptr0 = passStringToWasm0(id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.sphereintersector_set(this.ptr, ptr0, len0, x, y, z, radius);
+        wasm.sphereintersectorjs_set(this.ptr, ptr0, len0, x, y, z, radius);
     }
     /**
     * @param {number} origin_x
@@ -342,19 +342,19 @@ class SphereIntersector {
     * @returns {Array<String>}
     */
     intersect(origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, ray_length) {
-        var ret = wasm.sphereintersector_intersect(this.ptr, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, ray_length);
+        var ret = wasm.sphereintersectorjs_intersect(this.ptr, origin_x, origin_y, origin_z, direction_x, direction_y, direction_z, ray_length);
         return takeObject(ret);
     }
 }
-module.exports.SphereIntersector = SphereIntersector;
-
-module.exports.__wbindgen_object_drop_ref = function(arg0) {
-    takeObject(arg0);
-};
+module.exports.SphereIntersectorJS = SphereIntersectorJS;
 
 module.exports.__wbg_intersectresult_new = function(arg0) {
     var ret = IntersectResult.__wrap(arg0);
     return addHeapObject(ret);
+};
+
+module.exports.__wbindgen_object_drop_ref = function(arg0) {
+    takeObject(arg0);
 };
 
 module.exports.__wbindgen_string_new = function(arg0, arg1) {
