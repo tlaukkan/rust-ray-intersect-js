@@ -1,7 +1,10 @@
 # rust-ray-intersect-js
 
 Ray and mesh intersect implementation with Rust for JavaScript. Contains implementation for bounding spheres and
-triangles.
+triangles. This project depends on rust nalgebra and bvh crates:
+
+* https://docs.rs/nalgebra
+* https://docs.rs/bvh
 
 ## How to Run BabylonJS Performance Test
 
