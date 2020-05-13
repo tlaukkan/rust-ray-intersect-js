@@ -1,6 +1,7 @@
 # rust-ray-intersect-js
 
-Sandbox project for ray intersect implementation with Rust for JavaScript.
+Ray and mesh intersect implementation with Rust for JavaScript. Contains implementation for bounding spheres and
+triangles.
 
 ## How to Run BabylonJS Performance Test
 
