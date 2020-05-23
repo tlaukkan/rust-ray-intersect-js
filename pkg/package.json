@@ -1,9 +1,10 @@
 {
   "name": "@tlaukkan/intersect",
   "collaborators": [
-    "Tommi Laukkanen <tommi.laukkanen@codereality.io>"
+    "Tommi Laukkanen <tommi.laukkanen@codereality.io>",
+    "Julian Ramirez Ruiseco <Julian0024@gmail.com>"
   ],
-  "version": "0.0.28",
+  "version": "0.0.29",
   "files": [
     "intersect_bg.wasm",
     "intersect.js",
