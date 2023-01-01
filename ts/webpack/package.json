@@ -21,13 +21,13 @@
     "karma-firefox-launcher": "^1.3.0",
     "karma-mocha": "^2.0.1",
     "karma-sourcemap-loader": "^0.3.7",
-    "karma-webpack": "^4.0.2",
+    "karma-webpack": "^5.0.0",
     "mocha": "*",
-    "ts-loader": "^7.0.3",
+    "ts-loader": "^9.4.2",
     "ts-node": "^8.9.1",
     "typescript": "^3.8.3",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11"
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
   },
   "scripts": {
     "test": "karma start --single-run --browsers ChromeHeadless,FirefoxHeadless"
